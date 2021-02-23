@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "theme_definition/example",
+            "cwd": "theme_definition/example",
+            "request": "launch",
+            "program": "example.dart",
+            "type": "dart"
+        },
+        {
+            "name": "Editor",
+            "cwd": "theme_definition_editor",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "type": "dart"
+        }
+    ]
+}
