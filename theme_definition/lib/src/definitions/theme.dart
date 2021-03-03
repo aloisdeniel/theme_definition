@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:localization_builder/localization_builder.dart';
 import 'package:theme_definition/src/definitions/colors.dart';
 import 'package:theme_definition/src/definitions/font_sizes.dart';
 import 'package:theme_definition/src/definitions/radius.dart';
@@ -20,18 +21,20 @@ class ThemeDefinition extends Equatable {
     required this.icons,
     required this.durations,
     required this.sizes,
+    required this.labels,
   });
 
   factory ThemeDefinition.empty() => ThemeDefinition(
         name: '',
-        colors: [],
-        spacing: [],
-        fontStyles: [],
-        fontSizes: [],
-        radiuses: [],
-        icons: [],
-        durations: [],
-        sizes: [],
+        colors: const <VariantSet<Color>>[],
+        spacing: const <VariantSet<Spacing>>[],
+        fontStyles: const <VariantSet<FontStyle>>[],
+        fontSizes: const <VariantSet<FontSize>>[],
+        radiuses: const <VariantSet<Radius>>[],
+        icons: const <VariantSet<Icon>>[],
+        durations: const <VariantSet<Duration>>[],
+        sizes: const <VariantSet<Size>>[],
+        labels: null,
       );
 
   final String name;
@@ -43,6 +46,7 @@ class ThemeDefinition extends Equatable {
   final List<VariantSet<Icon>> icons;
   final List<VariantSet<Duration>> durations;
   final List<VariantSet<Size>> sizes;
+  final Localizations? labels;
 
   @override
   List<Object?> get props => [
@@ -55,6 +59,7 @@ class ThemeDefinition extends Equatable {
         icons,
         durations,
         sizes,
+        labels,
       ];
 }
 

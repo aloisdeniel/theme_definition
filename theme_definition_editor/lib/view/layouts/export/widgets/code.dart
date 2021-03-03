@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:theme_definition/theme_definition.dart' as def;
 import 'package:theme_definition_editor/state/app/state.dart';
 import 'package:theme_definition_editor/view/theme/theme.dart';
 
 class ThemeDartExport extends StatelessWidget {
   const ThemeDartExport({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

@@ -8,9 +8,9 @@ typedef ApplicationState InitialStateBuilder();
 
 class ApplicationStateProvider extends StatelessWidget {
   const ApplicationStateProvider({
-    Key key,
-    @required this.initialState,
-    @required this.child,
+    Key? key,
+    required this.initialState,
+    required this.child,
   }) : super(key: key);
 
   final InitialStateBuilder initialState;

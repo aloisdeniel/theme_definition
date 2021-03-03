@@ -5,6 +5,13 @@ enum FontSource {
   googleFonts,
 }
 
+enum TextDecoration {
+  none,
+  underline,
+  overline,
+  lineThrough,
+}
+
 class FontStyle extends Equatable {
   const FontStyle({
     required this.fontFamily,
@@ -12,6 +19,8 @@ class FontStyle extends Equatable {
     required this.fontWeight,
     required this.fontSize,
     required this.source,
+    required this.letterSpacing,
+    required this.decoration,
   });
 
   final String? fontFamily;
@@ -19,6 +28,8 @@ class FontStyle extends Equatable {
   final int? fontWeight;
   final double? fontSize;
   final FontSource? source;
+  final double? letterSpacing;
+  final TextDecoration? decoration;
 
   @override
   List<Object?> get props => [
@@ -27,5 +38,7 @@ class FontStyle extends Equatable {
         fontWeight,
         fontSize,
         source,
+        letterSpacing,
+        decoration,
       ];
 }

@@ -77,3 +77,18 @@ class ChangePreviewBrightness extends ApplicationUpdate {
     dispatch(SaveState());
   }
 }
+
+class ChangeCodeBrightness extends ApplicationUpdate {
+  const ChangeCodeBrightness(this.newBrightness);
+  final BrightnessMode newBrightness;
+  @override
+  Stream<ApplicationState> execute(ApplicationState Function() state,
+      dispatch(ApplicationUpdate update)) async* {
+    final currentState = state();
+    print(newBrightness);
+    yield currentState.copyWith(
+      editor: currentState.editor.copyWith(codeBrightness: newBrightness),
+    );
+    dispatch(SaveState());
+  }
+}

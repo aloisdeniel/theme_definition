@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:path_icon/path_icon.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_definition/theme_definition.dart';
+import 'package:localization_builder/localization_builder.dart'
+    as localization_builder;
 import 'package:theme_definition_editor/state/app/state.dart';
 import 'package:theme_definition_editor/view/layouts/preview/widgets/colors.dart';
 import 'package:theme_definition_editor/view/layouts/preview/widgets/durations.dart';
@@ -12,12 +14,13 @@ import 'package:theme_definition_editor/view/layouts/preview/widgets/spacing.dar
 import 'package:theme_definition_editor/view/theme/theme.dart';
 
 import 'widgets/icons.dart';
+import 'widgets/labels.dart';
 import 'widgets/radiuses.dart';
 import 'widgets/sizes.dart';
 
 class ThemePreviewLayout extends StatelessWidget {
   const ThemePreviewLayout({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -106,6 +109,11 @@ class ThemePreviewLayout extends StatelessWidget {
               variants: definition.icons,
             ),
           ),
+          if (definition.labels != null)
+            _LabelsSection(
+              title: 'Labels',
+              localizations: definition.labels!,
+            ),
         ],
       ),
     );
@@ -115,12 +123,12 @@ class ThemePreviewLayout extends StatelessWidget {
 typedef Widget _PreviewTileBuilder<T>(BuildContext context, String name);
 
 class _Section<T> extends StatelessWidget {
-  const _Section(
-      {Key key,
-      @required this.title,
-      @required this.variants,
-      @required this.builder})
-      : super(key: key);
+  const _Section({
+    Key? key,
+    required this.title,
+    required this.variants,
+    required this.builder,
+  }) : super(key: key);
 
   final String title;
   final List<VariantSet<T>> variants;
@@ -191,6 +199,144 @@ class _Section<T> extends StatelessWidget {
                     child: builder(context, name),
                   ),
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LabelsSection extends StatelessWidget {
+  const _LabelsSection({
+    Key? key,
+    required this.title,
+    required this.localizations,
+  }) : super(key: key);
+
+  final String title;
+  final localization_builder.Localizations localizations;
+
+  Iterable<Widget> _labels(
+    BuildContext context,
+    localization_builder.Section section,
+    int level,
+  ) sync* {
+    final theme = YamlTheme.of(context);
+
+    for (var label in section.labels) {
+      yield Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: LabelTile(
+          level: level,
+          languageCodes: localizations.supportedLanguageCodes,
+          label: label,
+          name: label.key,
+        ),
+      );
+    }
+
+    for (var child in section.children) {
+      yield Padding(
+        padding: EdgeInsets.only(top: theme.spacing.regular),
+        child: SizedBox(
+          width: 200,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ...Iterable.generate(
+                level,
+                (i) => PathIcon(
+                  theme.icons.pointLine,
+                  size: theme.fontSizes.regular,
+                  color: theme.colors.foreground2.withOpacity(0.3),
+                ),
+              ),
+              if (level > 0) ...[
+                PathIcon(
+                  theme.icons.cornerLine,
+                  size: theme.fontSizes.regular,
+                  color: theme.colors.foreground2,
+                ),
+                SizedBox(width: theme.spacing.semiSmall),
+              ],
+              Text(
+                child.key,
+                style: theme.fontStyles.content.copyWith(
+                  color: theme.colors.foreground1,
+                  fontSize: theme.fontSizes.regular,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      yield* _labels(context, child, level + 1);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (localizations.labels.isEmpty && localizations.children.isEmpty) {
+      return SizedBox();
+    }
+    final theme = YamlTheme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 12.0,
+        right: 12.0,
+        bottom: 32.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.fontStyles.title.copyWith(
+              color: theme.colors.foreground1,
+              fontSize: theme.fontSizes.big,
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 200,
+                    ),
+                    ...localizations.supportedLanguageCodes.map(
+                      (variant) => SizedBox(
+                        width: 200,
+                        child: Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: theme.colors.background2,
+                              borderRadius: theme.borderRadiuses.big,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: theme.spacing.small,
+                              horizontal: theme.spacing.semiBig,
+                            ),
+                            child: Text(
+                              variant,
+                              textAlign: TextAlign.center,
+                              style: theme.fontStyles.content.copyWith(
+                                color: theme.colors.foreground1,
+                                fontSize: theme.fontSizes.regular,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                ..._labels(context, localizations, 0),
               ],
             ),
           ),

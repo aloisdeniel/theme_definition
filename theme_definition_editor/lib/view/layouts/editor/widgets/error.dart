@@ -6,7 +6,7 @@ import 'package:theme_definition_editor/view/theme/theme.dart';
 
 class EditorErrorView extends StatelessWidget {
   const EditorErrorView({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

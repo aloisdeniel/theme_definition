@@ -1,46 +1,57 @@
 import 'dart:math' as math;
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:collection/collection.dart';
 import 'package:theme_definition_editor/view/theme/theme.dart';
+
+class StyledRange extends Equatable {
+  const StyledRange({
+    required this.style,
+    required this.start,
+    required this.end,
+  });
+  final TextStyle style;
+  final int start;
+  final int end;
+  bool get isEmpty => end - start <= 0;
+
+  @override
+  List<Object> get props => [style, start, end];
+}
 
 class StatelessTextField extends StatefulWidget {
   const StatelessTextField({
-    Key key,
-    @required this.text,
-    @required this.onTextChanged,
+    Key? key,
+    required this.text,
+    required this.onTextChanged,
     this.style,
     this.maxLines,
-    this.errorRange = TextRange.empty,
-    this.errorStyle,
+    this.styles = const <StyledRange>[],
     this.padding,
   }) : super(key: key);
 
   final String text;
   final ValueChanged<String> onTextChanged;
-  final int maxLines;
-  final TextStyle style;
-  final TextRange errorRange;
-  final TextStyle errorStyle;
-  final EdgeInsets padding;
+  final int? maxLines;
+  final TextStyle? style;
+  final List<StyledRange> styles;
+  final EdgeInsets? padding;
 
   @override
   _TextEditorState createState() => _TextEditorState();
 }
 
 class _TextEditorState extends State<StatelessTextField> {
-  _HighlightedController controller;
+  _HighlightedController? controller;
 
   @override
   void initState() {
     controller = _HighlightedController(
       widget.text,
-      widget.errorStyle ??
-          TextStyle(
-            backgroundColor: Colors.red,
-          ),
     );
-    controller.errorRange = widget.errorRange;
-    controller.addListener(onTextEdited);
+    controller!.styles = widget.styles;
+    controller!.addListener(onTextEdited);
     super.initState();
   }
 
@@ -50,21 +61,25 @@ class _TextEditorState extends State<StatelessTextField> {
 
   @override
   void didUpdateWidget(covariant StatelessTextField oldWidget) {
-    if (widget.text != controller.text) {
-      controller.text = widget.text;
-      controller.errorRange = widget.errorRange;
-      setState(() {});
-    } else if (widget.errorRange != controller.errorRange) {
-      controller.errorRange = widget.errorRange;
-      setState(() {});
+    final controller = this.controller;
+    if (controller != null) {
+      if (widget.text != controller.text) {
+        controller.text = widget.text;
+        controller.styles = widget.styles;
+        setState(() {});
+      } else if (!const ListEquality()
+          .equals(widget.styles, controller.styles)) {
+        controller.styles = widget.styles;
+        setState(() {});
+      }
     }
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   void dispose() {
-    controller.removeListener(onTextEdited);
-    controller.dispose();
+    controller?.removeListener(onTextEdited);
+    controller?.dispose();
     super.dispose();
   }
 
@@ -89,53 +104,70 @@ class _TextEditorState extends State<StatelessTextField> {
 }
 
 class _HighlightedController extends TextEditingController {
-  _HighlightedController(String text, this.errorStyle) : super(text: text);
+  _HighlightedController(String text) : super(text: text);
 
-  final TextStyle errorStyle;
-  TextRange _errorRange = TextRange.empty;
-  TextRange get errorRange => _errorRange;
-  set errorRange(TextRange value) {
-    if (_errorRange != value) {
-      _errorRange = value;
+  List<StyledRange> _styles = [];
+  List<StyledRange> get styles => _styles;
+  set styles(List<StyledRange> value) {
+    if (!const ListEquality().equals(_styles, value)) {
+      _styles = value;
       this.notifyListeners();
     }
   }
 
   @override
-  TextSpan buildTextSpan({TextStyle style, bool withComposing}) {
-    final initial = super.buildTextSpan(
-      style: style,
-      withComposing: withComposing,
-    );
+  TextSpan buildTextSpan({TextStyle? style, required bool withComposing}) {
+    if (text.isNotEmpty && styles.isNotEmpty) {
+      final spans = <TextSpan>[];
 
-    if (!errorRange.isCollapsed && text != null && text.isNotEmpty) {
-      final startOffet = math.max(0, errorRange.start);
-      final endOffet = math.min(text.length, errorRange.end);
-      final beforeError = startOffet == 0 ? '' : text.substring(0, startOffet);
-      final error = text.substring(startOffet, endOffet);
-      final afterError =
-          endOffet == text.length ? '' : text.substring(endOffet, text.length);
+      void addSpan(int start, int end, TextStyle style) {
+        if (text.isNotEmpty) {
+          final l = text.length;
+          print(l);
+          final subtext = text.substring(
+            start.clamp(0, text.length - 1),
+            end.clamp(0, text.length),
+          );
+          if (subtext.isNotEmpty) {
+            spans.add(
+              TextSpan(
+                text: subtext,
+                style: style,
+              ),
+            );
+          }
+        }
+      }
+
+      var previousEnd = 0;
+      final styles = this.styles.toList()
+        ..sort((x, y) => x.start.compareTo(y.start));
+      for (var rangeStyle in styles) {
+        if (rangeStyle.start - previousEnd > 0) {
+          addSpan(previousEnd, rangeStyle.start, style ?? const TextStyle());
+        }
+        final start = math.max(previousEnd, rangeStyle.start);
+        final end = math.max(start, rangeStyle.end);
+        addSpan(
+          start,
+          end,
+          rangeStyle.style,
+        );
+        previousEnd = rangeStyle.end;
+      }
+
+      if (previousEnd < text.length) {
+        addSpan(previousEnd, text.length, style ?? const TextStyle());
+      }
+
       return TextSpan(
-        children: [
-          if (beforeError.isNotEmpty)
-            TextSpan(
-              text: beforeError,
-              style: style,
-            ),
-          if (error.isNotEmpty)
-            TextSpan(
-              text: error,
-              style: errorStyle,
-            ),
-          if (afterError.isNotEmpty)
-            TextSpan(
-              text: afterError,
-              style: style,
-            ),
-        ],
+        children: spans,
       );
     }
 
-    return initial;
+    return super.buildTextSpan(
+      style: style,
+      withComposing: withComposing,
+    );
   }
 }

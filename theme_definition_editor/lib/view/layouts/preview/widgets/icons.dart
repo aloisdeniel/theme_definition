@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:path_icon/path_icon.dart';
 import 'package:theme_definition/theme_definition.dart' as definition;
 import 'package:theme_definition_editor/view/theme/theme.dart';
 
 class IconPreviewTile extends StatelessWidget {
   const IconPreviewTile({
-    Key key,
-    @required this.name,
-    @required this.variants,
+    Key? key,
+    required this.name,
+    required this.variants,
   }) : super(key: key);
 
   final String name;
@@ -47,7 +46,7 @@ class IconPreviewTile extends StatelessWidget {
                   ),
                   SizedBox(height: theme.spacing.small),
                   Text(
-                    '${data.viewBox.width}x${data.viewBox.height}',
+                    '${data.viewBox.width.ceil()}x${data.viewBox.height.ceil()}',
                     style: theme.fontStyles.content.copyWith(
                       color: theme.colors.foreground2,
                       fontSize: theme.fontSizes.small,

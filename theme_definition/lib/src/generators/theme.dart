@@ -1,3 +1,4 @@
+import 'package:localization_builder/localization_builder.dart';
 import 'package:theme_definition/theme_definition.dart';
 
 import 'base.dart';
@@ -138,6 +139,11 @@ String generateTheme(ThemeDefinition definition, {bool nullSafety = true}) {
 
   for (var childClass in childClasses) {
     result.writeln(childClass);
+  }
+
+  if (definition.labels != null) {
+    result.writeln();
+    result.writeln(DartLocalizationBuilder().build(definition.labels));
   }
 
   return result.toString();

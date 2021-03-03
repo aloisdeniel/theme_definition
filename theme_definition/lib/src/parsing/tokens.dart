@@ -12,6 +12,8 @@ enum ThemeParsingTokenType {
   doubleValue,
   stringValue,
   iconValue,
+  boolValue,
+  error,
 }
 
 class ThemeParsingToken extends Equatable {

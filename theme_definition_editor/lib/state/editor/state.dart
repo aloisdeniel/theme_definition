@@ -38,20 +38,20 @@ class EditorState extends Equatable {
         parsingResult = const EmptyParsingResult();
 
   const EditorState._({
-    @required this.yaml,
-    @required this.mode,
-    @required this.exportOptions,
-    @required this.exportedCode,
-    @required this.parsingResult,
-    @required this.codeBrightness,
-    @required this.previewBrightness,
+    required this.yaml,
+    required this.mode,
+    required this.exportOptions,
+    required this.exportedCode,
+    required this.parsingResult,
+    required this.codeBrightness,
+    required this.previewBrightness,
   });
 
   factory EditorState({
-    @required String yaml,
-    @required EditorMode mode,
-    @required BrightnessMode codeBrightness,
-    @required BrightnessMode previewBrightness,
+    required String yaml,
+    required EditorMode mode,
+    required BrightnessMode codeBrightness,
+    required BrightnessMode previewBrightness,
     ExportOptions exportOptions = const ExportOptions(
       nullSafety: false,
     ),
@@ -81,12 +81,12 @@ class EditorState extends Equatable {
   }
 
   EditorState copyWith({
-    String yaml,
-    EditorMode mode,
-    ExportOptions exportOptions,
-    ExportedCode exportedCode,
-    BrightnessMode codeBrightness,
-    BrightnessMode previewBrightness,
+    String? yaml,
+    EditorMode? mode,
+    ExportOptions? exportOptions,
+    ExportedCode? exportedCode,
+    BrightnessMode? codeBrightness,
+    BrightnessMode? previewBrightness,
   }) {
     if (yaml == null && exportOptions == null) {
       return EditorState._(
@@ -104,8 +104,8 @@ class EditorState extends Equatable {
       yaml: yaml ?? this.yaml,
       mode: mode ?? this.mode,
       exportOptions: exportOptions ?? this.exportOptions,
-      codeBrightness: codeBrightness,
-      previewBrightness: previewBrightness,
+      codeBrightness: codeBrightness ?? this.codeBrightness,
+      previewBrightness: previewBrightness ?? this.previewBrightness,
     );
   }
 
@@ -116,6 +116,8 @@ class EditorState extends Equatable {
         parsingResult,
         exportOptions,
         exportedCode,
+        codeBrightness,
+        previewBrightness,
       ];
 }
 
@@ -123,11 +125,11 @@ class ExportOptions extends Equatable {
   final bool nullSafety;
 
   const ExportOptions({
-    @required this.nullSafety,
+    required this.nullSafety,
   });
 
   ExportOptions copyWith({
-    bool nullSafety,
+    bool? nullSafety,
   }) =>
       ExportOptions(
         nullSafety: nullSafety ?? this.nullSafety,
@@ -143,13 +145,13 @@ class ExportedCode extends Equatable {
   final String dart;
   final bool copiedToCliboard;
   const ExportedCode({
-    @required this.dart,
-    @required this.copiedToCliboard,
+    required this.dart,
+    required this.copiedToCliboard,
   });
 
   ExportedCode copyWith({
-    String dart,
-    bool copiedToCliboard,
+    String? dart,
+    bool? copiedToCliboard,
   }) =>
       ExportedCode(
         dart: dart ?? this.dart,

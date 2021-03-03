@@ -4,7 +4,7 @@ import 'package:theme_definition_editor/view/layouts/export/widgets/export_bar.d
 
 class ThemeExportLayout extends StatelessWidget {
   const ThemeExportLayout({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override

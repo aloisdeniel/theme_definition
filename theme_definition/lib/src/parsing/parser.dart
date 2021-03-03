@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:localization_builder/localization_builder.dart';
 import 'package:theme_definition/src/definitions/colors.dart';
 import 'package:theme_definition/src/definitions/font_sizes.dart';
 import 'package:theme_definition/src/definitions/font_styles.dart';
@@ -13,7 +14,6 @@ import 'package:theme_definition/src/parsing/result.dart';
 import 'package:yaml/yaml.dart';
 
 import 'errors.dart';
-import 'helpers.dart';
 import 'tokens.dart';
 
 class ThemeDefinitionParser {
@@ -82,9 +82,27 @@ class ThemeDefinitionParser {
     }
   }
 
+  void _addValueToken(YamlNode key, ThemeParsingTokenType type) {
+    _tokens.add(
+      ThemeParsingToken(
+        start: key.span.start.offset,
+        end: key.span.end.offset,
+        type: type,
+      ),
+    );
+  }
+
   ThemeDefinition _parseMap(YamlMap map) {
+    var nameNode = map.nodes['name'];
+    String name;
+    if (nameNode != null) {
+      _addKeyTokenWithName(map, 'name', ThemeParsingTokenType.identifier1);
+      name = _parseScalarValueFromNode<String>(nameNode) ?? '';
+    } else {
+      name = 'App';
+    }
     return ThemeDefinition(
-      name: map['name']?.toString() ?? 'Theme',
+      name: name.toString(),
       colors: _parseVariantSets(map, 'colors', _parseColor),
       spacing: _parseVariantSets(map, 'spacing', _parseSpacing),
       fontStyles: _parseVariantSets(map, 'fontStyles', _parseFontStyle),
@@ -93,7 +111,52 @@ class ThemeDefinitionParser {
       icons: _parseVariantSets(map, 'icons', _parseIcon),
       durations: _parseVariantSets(map, 'durations', _parseDuration),
       sizes: _parseVariantSets(map, 'sizes', _parseSize),
+      labels: _parseLabels(map, 'labels', name),
     );
+  }
+
+  Localizations? _parseLabels(YamlMap map, String name, String themeName) {
+    final entry = map.nodes[name];
+    if (entry == null) {
+      return null;
+    }
+    if (!(entry.value is YamlMap)) {
+      return null;
+    }
+    final valueMap = entry.value as YamlMap;
+    final parser = YamlLocalizationParser();
+    try {
+      final result = parser.parse(valueMap);
+      for (var token in result.tokens) {
+        _tokens.add(
+          ThemeParsingToken(
+            start: token.node.span.start.offset,
+            end: token.node.span.end.offset,
+            type: () {
+              switch (token.type) {
+                case YamlLocalizationTokenType.sectionKey:
+                  return ThemeParsingTokenType.identifier3;
+                case YamlLocalizationTokenType.caseKey:
+                case YamlLocalizationTokenType.labelKey:
+                  return ThemeParsingTokenType.identifier4;
+                case YamlLocalizationTokenType.languageKey:
+                  return ThemeParsingTokenType.identifier2;
+                case YamlLocalizationTokenType.labelValue:
+                  return ThemeParsingTokenType.stringValue;
+                case YamlLocalizationTokenType.caseValue:
+                  return ThemeParsingTokenType.stringValue;
+                default:
+                  return ThemeParsingTokenType.text;
+              }
+            }(),
+          ),
+        );
+      }
+
+      return result.result.copyWith(name: '${themeName}LocalizationData');
+    } on ParsingException<YamlLocalizationToken> catch (e) {
+      throw ThemeDefinitionParsingException.fromNode(e.token.node, e.message);
+    }
   }
 
   List<VariantSet<T>> _parseVariantSets<T>(
@@ -138,44 +201,62 @@ class ThemeDefinitionParser {
       YamlMap map, String key, T Function(YamlNode node) parser) {
     return VariantSet<T>(
       name: key,
-      constants: map.nodes.entries
-          .map(
-            (x) => ConstantDefinition(
-              name: x.key.toString(),
-              value: parser(x.value),
-            ),
-          )
-          .toList(),
+      constants: map.nodes.entries.map(
+        (x) {
+          _addKeyToken(x.key, ThemeParsingTokenType.identifier3);
+          return ConstantDefinition(
+            name: x.key.toString(),
+            value: parser(x.value),
+          );
+        },
+      ).toList(),
     );
   }
 
   Color _parseColor(YamlNode value) {
-    var s = parseScalarValueFromNode<String>(value) ?? '0';
-
-    if (value is YamlScalar && value.value is num && s.length < 8) {
-      s = Iterable.generate(6 - s.length, (i) => i > 5 ? 'F' : '0')
-              .toList()
-              .reversed
-              .join() +
-          s;
-    }
-
+    final s = _parseScalarValueFromNode<String>(value) ?? '0';
     return Color.parse(s);
   }
 
   FontSize _parseFontSize(YamlNode value) {
-    return FontSize(parseScalarValueFromNode<double>(value) ?? 0);
+    return FontSize(_parseScalarValueFromNode<double>(value) ?? 0);
   }
 
   FontStyle _parseFontStyle(YamlNode value) {
     final map = value as YamlMap;
+
+    _addKeyTokenWithName(map, 'fontFamily', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'package', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'fontWeight', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'fontSize', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(
+        map, 'letterSpacing', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'decoration', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'source', ThemeParsingTokenType.identifier3);
+
     return FontStyle(
-      fontFamily: parseScalarValueFromNode<String>(map.nodes['fontFamily']),
-      package: parseScalarValueFromNode<String>(map.nodes['package']),
-      fontWeight: parseScalarValueFromNode<int>(map.nodes['fontWeight']),
-      fontSize: parseScalarValueFromNode<double>(map.nodes['fontSize']),
+      fontFamily: _parseScalarValueFromNode<String>(map.nodes['fontFamily']),
+      package: _parseScalarValueFromNode<String>(map.nodes['package']),
+      fontWeight: _parseScalarValueFromNode<int>(map.nodes['fontWeight']),
+      fontSize: _parseScalarValueFromNode<double>(map.nodes['fontSize']),
+      letterSpacing:
+          _parseScalarValueFromNode<double>(map.nodes['letterSpacing']),
+      decoration: () {
+        final decoration =
+            _parseScalarValueFromNode<String>(map.nodes['decoration']);
+        switch (decoration?.toLowerCase()) {
+          case 'underline':
+            return TextDecoration.underline;
+          case 'lineThrough':
+            return TextDecoration.lineThrough;
+          case 'overline':
+            return TextDecoration.overline;
+          default:
+            return TextDecoration.none;
+        }
+      }(),
       source: () {
-        switch (parseScalarValueFromNode<String>(map.nodes['source'])
+        switch (_parseScalarValueFromNode<String>(map.nodes['source'])
             ?.toLowerCase()
             .replaceAll(' ', '')) {
           case 'googlefonts':
@@ -188,43 +269,124 @@ class ThemeDefinitionParser {
   }
 
   Icon _parseIcon(YamlNode value) {
-    return Icon(parseScalarValueFromNode<String>(value) ?? '');
+    return Icon(_parseScalarValueFromNode<String>(value) ?? '');
   }
 
   Radius _parseRadius(YamlNode value) {
-    return Radius(parseScalarValueFromNode<double>(value) ?? 0);
+    return Radius(_parseScalarValueFromNode<double>(value) ?? 0);
   }
 
   Spacing _parseSpacing(YamlNode value) {
-    return Spacing(parseScalarValueFromNode<double>(value) ?? 0);
+    return Spacing(_parseScalarValueFromNode<double>(value) ?? 0);
   }
 
   Size _parseSize(YamlNode value) {
     if (value is YamlScalar && value.value is double) {
+      _addValueToken(value, ThemeParsingTokenType.doubleValue);
       final size = value.value as double;
       return Size(size, size);
     }
     final map = value as YamlMap;
-    final width = parseScalarValueFromNode<double>(map.nodes['width']) ?? 0;
-    final height = parseScalarValueFromNode<double>(map.nodes['height']) ?? 0;
+    _addKeyTokenWithName(map, 'width', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'height', ThemeParsingTokenType.identifier3);
+    final width = _parseScalarValueFromNode<double>(map.nodes['width']) ?? 0;
+    final height = _parseScalarValueFromNode<double>(map.nodes['height']) ?? 0;
     return Size(width, height);
   }
 
   Duration _parseDuration(YamlNode value) {
     if (value is YamlScalar && value.value is num) {
+      _addValueToken(value, ThemeParsingTokenType.stringValue);
       final milliseconds = value.value as num;
       return Duration(
         milliseconds: milliseconds.toDouble().ceil(),
       );
     }
     final map = value as YamlMap;
+
+    _addKeyTokenWithName(
+        map, 'milliseconds', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'minutes', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'seconds', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'hours', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'days', ThemeParsingTokenType.identifier3);
     return Duration(
       milliseconds:
-          parseScalarValueFromNode<int>(map.nodes['milliseconds']) ?? 0,
-      minutes: parseScalarValueFromNode<int>(map.nodes['minutes']) ?? 0,
-      seconds: parseScalarValueFromNode<int>(map.nodes['seconds']) ?? 0,
-      hours: parseScalarValueFromNode<int>(map.nodes['hours']) ?? 0,
-      days: parseScalarValueFromNode<int>(map.nodes['days']) ?? 0,
+          _parseScalarValueFromNode<int>(map.nodes['milliseconds']) ?? 0,
+      minutes: _parseScalarValueFromNode<int>(map.nodes['minutes']) ?? 0,
+      seconds: _parseScalarValueFromNode<int>(map.nodes['seconds']) ?? 0,
+      hours: _parseScalarValueFromNode<int>(map.nodes['hours']) ?? 0,
+      days: _parseScalarValueFromNode<int>(map.nodes['days']) ?? 0,
     );
+  }
+
+  final _hexAsENotationRegex = RegExp(r'([0-9]*)\.([0-9]+)(e|E)\+([0-9]+)');
+
+  T? _parseScalarValueFromNode<T>(YamlNode? node) {
+    if (node == null) {
+      return null;
+    }
+    if (!(node is YamlScalar)) {
+      throw ThemeDefinitionParsingException.fromNode(node, 'Should be a value');
+    }
+    final scalar = node;
+
+    if (T == String) {
+      _addValueToken(scalar, ThemeParsingTokenType.stringValue);
+      if (scalar.value is String) {
+        return scalar.value;
+      }
+    } else if (T == double) {
+      _addValueToken(scalar, ThemeParsingTokenType.doubleValue);
+      if (scalar.value is String) {
+        try {
+          return double.parse(scalar.value) as T;
+        } catch (e) {
+          throw ThemeDefinitionParsingException.fromNode(
+              node, 'Expecting a double value');
+        }
+      }
+      if (scalar.value is double) {
+        return scalar.value as T;
+      }
+      if (scalar.value is int) {
+        return scalar.value.toDouble() as T;
+      }
+      throw ThemeDefinitionParsingException.fromNode(
+          node, 'Expecting a double value');
+    } else if (T == int) {
+      _addValueToken(scalar, ThemeParsingTokenType.doubleValue);
+      if (scalar.value is String) {
+        try {
+          return int.parse(scalar.value) as T;
+        } catch (e) {
+          throw ThemeDefinitionParsingException.fromNode(
+              node, 'Expecting an integer value');
+        }
+      }
+      if (scalar.value is double) {
+        return scalar.value.toInt() as T;
+      }
+      if (scalar.value is int) {
+        return scalar.value as T;
+      }
+      throw ThemeDefinitionParsingException.fromNode(
+          node, 'Expecting an integer value');
+    } else if (T == bool) {
+      _addValueToken(scalar, ThemeParsingTokenType.boolValue);
+      if (scalar.value is String) {
+        return (scalar.value == 'true') as T;
+      }
+      if (scalar.value is int) {
+        return (scalar.value == 1) as T;
+      }
+      if (scalar.value is bool) {
+        return scalar.value as T;
+      }
+      throw ThemeDefinitionParsingException.fromNode(
+          node, 'Expecting a boolean value');
+    }
+    throw ThemeDefinitionParsingException.fromNode(
+        node, 'Unexpected value type');
   }
 }

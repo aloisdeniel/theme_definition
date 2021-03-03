@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:theme_definition/theme_definition.dart';
 import 'package:theme_definition_editor/state/app/state.dart';
 import 'package:theme_definition_editor/state/app/update.dart';
 import 'package:theme_definition_editor/state/editor/state.dart';
@@ -17,7 +16,7 @@ import 'widgets/app_bar.dart';
 
 class EditorLayout extends StatelessWidget {
   const EditorLayout({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -25,6 +24,14 @@ class EditorLayout extends StatelessWidget {
     final theme = YamlTheme.of(context);
     final mediaQuery = MediaQuery.of(context);
     final isLarge = mediaQuery.size.width > 600;
+
+    var leftBrightness = context.select(
+      (ApplicationState state) => state.editor.codeBrightness,
+    );
+
+    var rightBrightness = context.select(
+      (ApplicationState state) => state.editor.previewBrightness,
+    );
     return Container(
       color: theme.colors.background1,
       child: Row(
@@ -34,7 +41,9 @@ class EditorLayout extends StatelessWidget {
             Expanded(
               child: YamlTheme(
                 data: YamlThemeData.fallback().copyWith(
-                  colors: YamlColorsData.dark(),
+                  colors: leftBrightness == BrightnessMode.dark
+                      ? YamlColorsData.dark()
+                      : YamlColorsData.light(),
                 ),
                 child: _LeftPanel(),
               ),
@@ -42,7 +51,9 @@ class EditorLayout extends StatelessWidget {
           Expanded(
             child: YamlTheme(
               data: YamlThemeData.fallback().copyWith(
-                colors: YamlColorsData.semiDark(),
+                colors: rightBrightness == BrightnessMode.dark
+                    ? YamlColorsData.semiDark()
+                    : YamlColorsData.extraLight(),
               ),
               child: _RightPanel(
                 withCode: !isLarge,
@@ -57,7 +68,7 @@ class EditorLayout extends StatelessWidget {
 
 class _LeftPanel extends StatelessWidget {
   const _LeftPanel({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -74,8 +85,8 @@ class _LeftPanel extends StatelessWidget {
 
 class _RightPanel extends StatefulWidget {
   const _RightPanel({
-    Key key,
-    @required this.withCode,
+    Key? key,
+    required this.withCode,
   }) : super(key: key);
 
   final bool withCode;
@@ -122,7 +133,7 @@ class _RightPanelState extends State<_RightPanel> {
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               layoutBuilder:
-                  (Widget currentChild, List<Widget> previousChildren) {
+                  (Widget? currentChild, List<Widget> previousChildren) {
                 return Stack(
                   children: <Widget>[
                     ...previousChildren.map((e) => Positioned.fill(child: e)),

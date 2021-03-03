@@ -6,9 +6,9 @@ import 'package:theme_definition_editor/view/theme/theme.dart';
 
 class FontSizeStylePreviewTile extends StatelessWidget {
   const FontSizeStylePreviewTile({
-    Key key,
-    @required this.name,
-    @required this.variants,
+    Key? key,
+    required this.name,
+    required this.variants,
   }) : super(key: key);
 
   final String name;

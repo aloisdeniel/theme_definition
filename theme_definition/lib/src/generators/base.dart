@@ -81,6 +81,10 @@ String buildFontStyleInstance(FontStyle value) {
     result.write('fontSize: ${value.fontSize?.buildDouble()},');
   }
 
+  if (value.decoration != null) {
+    result.write('decoration: ${value.decoration.toString()},');
+  }
+
   result.write(')');
   return result.toString();
 }

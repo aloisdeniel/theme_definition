@@ -11,8 +11,8 @@ import 'package:theme_definition_editor/view/widgets/brightness_switch.dart';
 
 class RightEditorBar extends StatelessWidget {
   const RightEditorBar({
-    Key key,
-    @required this.withCode,
+    Key? key,
+    required this.withCode,
   }) : super(key: key);
 
   final bool withCode;
@@ -21,38 +21,42 @@ class RightEditorBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = YamlTheme.of(context);
     var mode = context.select((ApplicationState state) => state.editor.mode);
+    final mediaQuery = MediaQuery.of(context);
+    final isLarge = mediaQuery.size.width > 600;
     var brightness = context
         .select((ApplicationState state) => state.editor.previewBrightness);
     if (!withCode && mode == EditorMode.code) {
       mode = EditorMode.preview;
     }
+    final title = Text(
+      () {
+        switch (mode) {
+          case EditorMode.preview:
+            return 'Preview';
+          case EditorMode.export:
+            return 'Export';
+          case EditorMode.code:
+            return 'Yaml Theme Editor';
+        }
+      }(),
+      textAlign: TextAlign.center,
+      style: theme.fontStyles.title.copyWith(
+        color: theme.colors.foreground2,
+        fontSize: isLarge ? theme.fontSizes.regular : theme.fontSizes.small,
+      ),
+    );
     return Container(
       color: theme.colors.background2,
       height: theme.fontSizes.regular * 5,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Text(
-            () {
-              switch (mode) {
-                case EditorMode.preview:
-                  return 'Preview';
-                case EditorMode.export:
-                  return 'Export';
-                case EditorMode.code:
-                  return 'Yaml Theme Editor';
-              }
-            }(),
-            style: theme.fontStyles.title.copyWith(
-              color: theme.colors.foreground2,
-              fontSize: theme.fontSizes.regular,
-            ),
-          ),
+          if (isLarge) title,
           Positioned.fill(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (withCode)
                   EditorBarTab(
@@ -82,11 +86,14 @@ class RightEditorBar extends StatelessWidget {
                     }
                   },
                 ),
-                Spacer(),
+                if (isLarge) Spacer(),
+                if (!isLarge) Expanded(child: Center(child: title)),
                 BrightnessSwitch(
                   value: brightness,
-                  onValueChanged: (v) {},
+                  onValueChanged: (v) =>
+                      context.dispatch(ChangePreviewBrightness(v)),
                 ),
+                SizedBox(width: theme.spacing.regular),
               ],
             ),
           ),
@@ -98,10 +105,10 @@ class RightEditorBar extends StatelessWidget {
 
 class EditorBarTab extends StatelessWidget {
   const EditorBarTab({
-    Key key,
-    @required this.isSelected,
-    @required this.onSelectedChanged,
-    @required this.icon,
+    Key? key,
+    required this.isSelected,
+    required this.onSelectedChanged,
+    required this.icon,
   }) : super(key: key);
 
   final bool isSelected;

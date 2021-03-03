@@ -9,7 +9,7 @@ import 'package:theme_definition_editor/view/theme/theme.dart';
 
 class ExportEditorBar extends StatelessWidget {
   const ExportEditorBar({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -62,10 +62,10 @@ class ExportEditorBar extends StatelessWidget {
 
 class Checkbox extends StatelessWidget {
   const Checkbox({
-    Key key,
-    @required this.isSelected,
-    @required this.onSelectedChanged,
-    @required this.icon,
+    Key? key,
+    required this.isSelected,
+    required this.onSelectedChanged,
+    required this.icon,
   }) : super(key: key);
 
   final bool isSelected;
@@ -105,15 +105,15 @@ class Checkbox extends StatelessWidget {
 
 class ActionButton extends StatelessWidget {
   const ActionButton({
-    Key key,
+    Key? key,
     this.icon,
     this.title,
-    @required this.onTap,
+    required this.onTap,
   }) : super(key: key);
 
   final VoidCallback onTap;
-  final PathIconData icon;
-  final String title;
+  final PathIconData? icon;
+  final String? title;
 
   @override
   Widget build(BuildContext context) {
@@ -134,20 +134,22 @@ class ActionButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AnimatedPathIcon(
-                icon,
-                duration: theme.durations.regular,
-                size: theme.fontSizes.regular,
-                color: theme.colors.foreground1,
-              ),
-              SizedBox(width: theme.spacing.semiSmall),
-              Text(
-                title,
-                style: theme.fontStyles.content.copyWith(
+              if (icon != null)
+                AnimatedPathIcon(
+                  icon!,
+                  duration: theme.durations.regular,
+                  size: theme.fontSizes.regular,
                   color: theme.colors.foreground1,
-                  fontSize: theme.fontSizes.regular,
                 ),
-              ),
+              SizedBox(width: theme.spacing.semiSmall),
+              if (title != null)
+                Text(
+                  title!,
+                  style: theme.fontStyles.content.copyWith(
+                    color: theme.colors.foreground1,
+                    fontSize: theme.fontSizes.regular,
+                  ),
+                ),
             ],
           ),
         );

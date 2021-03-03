@@ -9,9 +9,9 @@ class InhheritedWidgetClassBuilder {
     final name = '${this.name}Theme';
     return '''class ${name} extends InheritedWidget {
   const ${name}({
-    Key key,
+    Key${nullSafety ? '?' : ''} key,
     ${nullSafety ? '' : '@'}required this.data,
-    Widget child,
+    ${nullSafety ? '' : '@'}required Widget child,
   }) : super(key: key, child: child);
 
   final ${name}Data data;

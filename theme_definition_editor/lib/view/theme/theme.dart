@@ -1,13 +1,12 @@
-import 'package:meta/meta.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path_icon/path_icon.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class YamlTheme extends InheritedWidget {
   const YamlTheme({
-    Key key,
-    @required this.data,
-    Widget child,
+    Key? key,
+    required this.data,
+    required Widget child,
   }) : super(key: key, child: child);
 
   final YamlThemeData data;
@@ -25,22 +24,16 @@ class YamlTheme extends InheritedWidget {
 
 class YamlColorsData {
   const YamlColorsData({
-    @required this.accent1,
-    @required this.accent2,
-    @required this.background1,
-    @required this.background2,
-    @required this.foreground1,
-    @required this.foreground2,
-    @required this.error1,
-    @required this.error2,
-  })  : assert(accent1 != null),
-        assert(accent2 != null),
-        assert(background1 != null),
-        assert(background2 != null),
-        assert(foreground1 != null),
-        assert(foreground2 != null),
-        assert(error1 != null),
-        assert(error2 != null);
+    required this.accent1,
+    required this.accent2,
+    required this.background1,
+    required this.background2,
+    required this.foreground1,
+    required this.foreground2,
+    required this.foreground3,
+    required this.error1,
+    required this.error2,
+  });
 
   const YamlColorsData.dark()
       : this.accent1 = const Color(0xFF885FFD),
@@ -48,7 +41,8 @@ class YamlColorsData {
         this.background1 = const Color(0xFF202538),
         this.background2 = const Color(0xFF131727),
         this.foreground1 = const Color(0xFFF4F0FF),
-        this.foreground2 = const Color(0xFF718797),
+        this.foreground2 = const Color(0xFF8EA6B8),
+        this.foreground3 = const Color(0xFF718797),
         this.error1 = const Color(0xFFC74D54),
         this.error2 = const Color(0xFF672E31);
 
@@ -58,7 +52,8 @@ class YamlColorsData {
         this.background1 = const Color(0xFF282E47),
         this.background2 = const Color(0xFF1C2239),
         this.foreground1 = const Color(0xFFF8F5FF),
-        this.foreground2 = const Color(0xFF97B0C1),
+        this.foreground2 = const Color(0xFFA8C5D9),
+        this.foreground3 = const Color(0xFF97B0C1),
         this.error1 = const Color(0xFFC74D54),
         this.error2 = const Color(0xFF672E31);
 
@@ -68,7 +63,8 @@ class YamlColorsData {
         this.background1 = const Color(0xFFE6EBFD),
         this.background2 = const Color(0xFFD0D8EE),
         this.foreground1 = const Color(0xFF252B43),
-        this.foreground2 = const Color(0xFF718797),
+        this.foreground2 = const Color(0xFF577184),
+        this.foreground3 = const Color(0xFF718797),
         this.error1 = const Color(0xFFC74D54),
         this.error2 = const Color(0xFF672E31);
 
@@ -78,7 +74,8 @@ class YamlColorsData {
         this.background1 = const Color(0xFFF4F7FF),
         this.background2 = const Color(0xFFE9EEFC),
         this.foreground1 = const Color(0xFF131727),
-        this.foreground2 = const Color(0xFF7F8F9B),
+        this.foreground2 = const Color(0xFF6A7C89),
+        this.foreground3 = const Color(0xFF7F8F9B),
         this.error1 = const Color(0xFFE26169),
         this.error2 = const Color(0xFF763B3F);
 
@@ -88,18 +85,20 @@ class YamlColorsData {
   final Color background2;
   final Color foreground1;
   final Color foreground2;
+  final Color foreground3;
   final Color error1;
   final Color error2;
 
   YamlColorsData copyWith({
-    Color accent1,
-    Color accent2,
-    Color background1,
-    Color background2,
-    Color foreground1,
-    Color foreground2,
-    Color error1,
-    Color error2,
+    Color? accent1,
+    Color? accent2,
+    Color? background1,
+    Color? background2,
+    Color? foreground1,
+    Color? foreground2,
+    Color? foreground3,
+    Color? error1,
+    Color? error2,
   }) =>
       YamlColorsData(
         accent1: accent1 ?? this.accent1,
@@ -108,6 +107,7 @@ class YamlColorsData {
         background2: background2 ?? this.background2,
         foreground1: foreground1 ?? this.foreground1,
         foreground2: foreground2 ?? this.foreground2,
+        foreground3: foreground3 ?? this.foreground3,
         error1: error1 ?? this.error1,
         error2: error2 ?? this.error2,
       );
@@ -122,6 +122,7 @@ class YamlColorsData {
           background2 == other.background2 &&
           foreground1 == other.foreground1 &&
           foreground2 == other.foreground2 &&
+          foreground3 == other.foreground3 &&
           error1 == other.error1 &&
           error2 == other.error2);
   @override
@@ -133,16 +134,17 @@ class YamlColorsData {
       background2.hashCode ^
       foreground1.hashCode ^
       foreground2.hashCode ^
+      foreground3.hashCode ^
       error1.hashCode ^
       error2.hashCode;
 }
 
 class YamlFontStylesData {
   const YamlFontStylesData({
-    @required TextStyle title,
-    @required TextStyle content,
-    @required TextStyle code,
-  })  : _title = title,
+    required TextStyle title,
+    required TextStyle content,
+    required TextStyle code,
+  })   : _title = title,
         _content = content,
         _code = code;
 
@@ -152,17 +154,17 @@ class YamlFontStylesData {
         _code = null;
 
   const factory YamlFontStylesData.regular() = _YamlFontStylesDataRegular;
-  final TextStyle _title;
-  TextStyle get title => _title != null ? _title : throw Exception();
-  final TextStyle _content;
-  TextStyle get content => _content != null ? _content : throw Exception();
-  final TextStyle _code;
-  TextStyle get code => _code != null ? _code : throw Exception();
+  final TextStyle? _title;
+  TextStyle get title => _title!;
+  final TextStyle? _content;
+  TextStyle get content => _content!;
+  final TextStyle? _code;
+  TextStyle get code => _code!;
 
   YamlFontStylesData copyWith({
-    TextStyle title,
-    TextStyle content,
-    TextStyle code,
+    TextStyle? title,
+    TextStyle? content,
+    TextStyle? code,
   }) =>
       YamlFontStylesData(
         title: title ?? this.title,
@@ -190,33 +192,32 @@ class _YamlFontStylesDataRegular extends YamlFontStylesData {
   static final _titleInstance = GoogleFonts.getFont(
     'Montserrat',
     fontWeight: FontWeight.w700,
+    decoration: TextDecoration.none,
   );
   @override
   TextStyle get content => _contentInstance;
   static final _contentInstance = GoogleFonts.getFont(
     'Roboto',
     fontWeight: FontWeight.w400,
+    decoration: TextDecoration.none,
   );
   @override
   TextStyle get code => _codeInstance;
   static final _codeInstance = GoogleFonts.getFont(
     'Fira Code',
     fontWeight: FontWeight.w400,
+    decoration: TextDecoration.none,
   );
 }
 
 class YamlFontSizesData {
   const YamlFontSizesData({
-    @required this.small,
-    @required this.semiSmall,
-    @required this.regular,
-    @required this.semiBig,
-    @required this.big,
-  })  : assert(small != null),
-        assert(semiSmall != null),
-        assert(regular != null),
-        assert(semiBig != null),
-        assert(big != null);
+    required this.small,
+    required this.semiSmall,
+    required this.regular,
+    required this.semiBig,
+    required this.big,
+  });
 
   const YamlFontSizesData.regular()
       : this.small = 9.00,
@@ -232,11 +233,11 @@ class YamlFontSizesData {
   final double big;
 
   YamlFontSizesData copyWith({
-    double small,
-    double semiSmall,
-    double regular,
-    double semiBig,
-    double big,
+    double? small,
+    double? semiSmall,
+    double? regular,
+    double? semiBig,
+    double? big,
   }) =>
       YamlFontSizesData(
         small: small ?? this.small,
@@ -267,14 +268,11 @@ class YamlFontSizesData {
 
 class YamlRadiusesData {
   const YamlRadiusesData({
-    @required this.small,
-    @required this.regular,
-    @required this.big,
-    @required this.extraBig,
-  })  : assert(small != null),
-        assert(regular != null),
-        assert(big != null),
-        assert(extraBig != null);
+    required this.small,
+    required this.regular,
+    required this.big,
+    required this.extraBig,
+  });
 
   const YamlRadiusesData.regular()
       : this.small = const Radius.circular(2.00),
@@ -288,10 +286,10 @@ class YamlRadiusesData {
   final Radius extraBig;
 
   YamlRadiusesData copyWith({
-    Radius small,
-    Radius regular,
-    Radius big,
-    Radius extraBig,
+    Radius? small,
+    Radius? regular,
+    Radius? big,
+    Radius? extraBig,
   }) =>
       YamlRadiusesData(
         small: small ?? this.small,
@@ -319,14 +317,11 @@ class YamlRadiusesData {
 
 class YamlBorderRadiusesData {
   const YamlBorderRadiusesData({
-    @required this.small,
-    @required this.regular,
-    @required this.big,
-    @required this.extraBig,
-  })  : assert(small != null),
-        assert(regular != null),
-        assert(big != null),
-        assert(extraBig != null);
+    required this.small,
+    required this.regular,
+    required this.big,
+    required this.extraBig,
+  });
 
   const YamlBorderRadiusesData.regular()
       : this.small = const BorderRadius.all(Radius.circular(2.00)),
@@ -340,10 +335,10 @@ class YamlBorderRadiusesData {
   final BorderRadius extraBig;
 
   YamlBorderRadiusesData copyWith({
-    BorderRadius small,
-    BorderRadius regular,
-    BorderRadius big,
-    BorderRadius extraBig,
+    BorderRadius? small,
+    BorderRadius? regular,
+    BorderRadius? big,
+    BorderRadius? extraBig,
   }) =>
       YamlBorderRadiusesData(
         small: small ?? this.small,
@@ -371,20 +366,24 @@ class YamlBorderRadiusesData {
 
 class YamlIconsData {
   const YamlIconsData({
-    @required PathIconData palette,
-    @required PathIconData exportCode,
-    @required PathIconData checkmark,
-    @required PathIconData clipboard,
-    @required PathIconData textEdit,
-    @required PathIconData sun,
-    @required PathIconData moon,
-  })  : _palette = palette,
+    required PathIconData palette,
+    required PathIconData exportCode,
+    required PathIconData checkmark,
+    required PathIconData clipboard,
+    required PathIconData textEdit,
+    required PathIconData sun,
+    required PathIconData moon,
+    required PathIconData cornerLine,
+    required PathIconData pointLine,
+  })   : _palette = palette,
         _exportCode = exportCode,
         _checkmark = checkmark,
         _clipboard = clipboard,
         _textEdit = textEdit,
         _sun = sun,
-        _moon = moon;
+        _moon = moon,
+        _cornerLine = cornerLine,
+        _pointLine = pointLine;
 
   const YamlIconsData._()
       : _palette = null,
@@ -393,37 +392,41 @@ class YamlIconsData {
         _clipboard = null,
         _textEdit = null,
         _sun = null,
-        _moon = null;
+        _moon = null,
+        _cornerLine = null,
+        _pointLine = null;
 
   const factory YamlIconsData.lines() = _YamlIconsDataLines;
   const factory YamlIconsData.filled() = _YamlIconsDataFilled;
-  final PathIconData _palette;
-  PathIconData get palette => _palette != null ? _palette : throw Exception();
-  final PathIconData _exportCode;
-  PathIconData get exportCode =>
-      _exportCode != null ? _exportCode : throw Exception();
-  final PathIconData _checkmark;
-  PathIconData get checkmark =>
-      _checkmark != null ? _checkmark : throw Exception();
-  final PathIconData _clipboard;
-  PathIconData get clipboard =>
-      _clipboard != null ? _clipboard : throw Exception();
-  final PathIconData _textEdit;
-  PathIconData get textEdit =>
-      _textEdit != null ? _textEdit : throw Exception();
-  final PathIconData _sun;
-  PathIconData get sun => _sun != null ? _sun : throw Exception();
-  final PathIconData _moon;
-  PathIconData get moon => _moon != null ? _moon : throw Exception();
+  final PathIconData? _palette;
+  PathIconData get palette => _palette!;
+  final PathIconData? _exportCode;
+  PathIconData get exportCode => _exportCode!;
+  final PathIconData? _checkmark;
+  PathIconData get checkmark => _checkmark!;
+  final PathIconData? _clipboard;
+  PathIconData get clipboard => _clipboard!;
+  final PathIconData? _textEdit;
+  PathIconData get textEdit => _textEdit!;
+  final PathIconData? _sun;
+  PathIconData get sun => _sun!;
+  final PathIconData? _moon;
+  PathIconData get moon => _moon!;
+  final PathIconData? _cornerLine;
+  PathIconData get cornerLine => _cornerLine!;
+  final PathIconData? _pointLine;
+  PathIconData get pointLine => _pointLine!;
 
   YamlIconsData copyWith({
-    PathIconData palette,
-    PathIconData exportCode,
-    PathIconData checkmark,
-    PathIconData clipboard,
-    PathIconData textEdit,
-    PathIconData sun,
-    PathIconData moon,
+    PathIconData? palette,
+    PathIconData? exportCode,
+    PathIconData? checkmark,
+    PathIconData? clipboard,
+    PathIconData? textEdit,
+    PathIconData? sun,
+    PathIconData? moon,
+    PathIconData? cornerLine,
+    PathIconData? pointLine,
   }) =>
       YamlIconsData(
         palette: palette ?? this.palette,
@@ -433,6 +436,8 @@ class YamlIconsData {
         textEdit: textEdit ?? this.textEdit,
         sun: sun ?? this.sun,
         moon: moon ?? this.moon,
+        cornerLine: cornerLine ?? this.cornerLine,
+        pointLine: pointLine ?? this.pointLine,
       );
 
   @override
@@ -445,7 +450,9 @@ class YamlIconsData {
           clipboard == other.clipboard &&
           textEdit == other.textEdit &&
           sun == other.sun &&
-          moon == other.moon);
+          moon == other.moon &&
+          cornerLine == other.cornerLine &&
+          pointLine == other.pointLine);
   @override
   int get hashCode =>
       runtimeType.hashCode ^
@@ -455,7 +462,9 @@ class YamlIconsData {
       clipboard.hashCode ^
       textEdit.hashCode ^
       sun.hashCode ^
-      moon.hashCode;
+      moon.hashCode ^
+      cornerLine.hashCode ^
+      pointLine.hashCode;
 }
 
 class _YamlIconsDataLines extends YamlIconsData {
@@ -488,7 +497,15 @@ class _YamlIconsDataLines extends YamlIconsData {
   @override
   PathIconData get moon => _moonInstance;
   static final _moonInstance = PathIconData.fromSvg(
-      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M20.0258 17.0014C17.2639 21.7851 11.1471 23.4241 6.3634 20.6622C5.06068 19.9101 3.964 18.8926 3.12872 17.6797C2.84945 17.2741 3.0301 16.7141 3.49369 16.5482C7.26112 15.1997 9.27892 13.6372 10.4498 11.4021C11.6825 9.04908 12.001 6.47162 11.1387 2.93862C11.0195 2.45008 11.4053 1.98492 11.9075 2.01186C13.4645 2.09539 14.9856 2.54263 16.3649 3.33903C21.1486 6.10088 22.7876 12.2177 20.0258 17.0014Z" fill="#212121"/> </svg>');
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M20.0258 17.0012C17.2639 21.7848 11.1471 23.4238 6.3634 20.662C5.06068 19.9099 3.964 18.8924 3.12872 17.6794C2.84945 17.2739 3.0301 16.7138 3.49369 16.5479C7.26112 15.1995 9.27892 13.6369 10.4498 11.4018C11.6825 9.04884 12.001 6.47137 11.1387 2.93837C11.0195 2.44984 11.4053 1.98467 11.9075 2.01161C13.4645 2.09515 14.9856 2.54239 16.3649 3.33878C21.1486 6.10064 22.7876 12.2175 20.0258 17.0012ZM11.7785 12.0979C10.5272 14.4865 8.46706 16.1969 4.96104 17.5968C5.56929 18.2926 6.29275 18.8891 7.1134 19.3629C11.1796 21.7106 16.3791 20.3174 18.7267 16.2512C21.0744 12.1849 19.6812 6.98546 15.6149 4.63782C14.7379 4.13146 13.7951 3.79144 12.8228 3.62229C13.4699 7.00628 13.0525 9.66598 11.7785 12.0979Z" fill="#212121"/> </svg>');
+  @override
+  PathIconData get cornerLine => _cornerLineInstance;
+  static final _cornerLineInstance = PathIconData.fromSvg(
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" clip-rule="evenodd" d="M11.2929 12.7071C11.1054 12.5196 11 12.2652 11 12L11 2C11 1.44772 11.4477 1 12 1C12.5523 1 13 1.44772 13 2L13 11L22 11C22.5523 11 23 11.4477 23 12C23 12.5523 22.5523 13 22 13L12 13C11.7348 13 11.4804 12.8946 11.2929 12.7071Z" fill="black"/> </svg>');
+  @override
+  PathIconData get pointLine => _pointLineInstance;
+  static final _pointLineInstance = PathIconData.fromSvg(
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="3" fill="black"/> </svg>');
 }
 
 class _YamlIconsDataFilled extends YamlIconsData {
@@ -521,25 +538,27 @@ class _YamlIconsDataFilled extends YamlIconsData {
   @override
   PathIconData get moon => _moonInstance;
   static final _moonInstance = PathIconData.fromSvg(
-      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M20.0258 17.0012C17.2639 21.7848 11.1471 23.4238 6.3634 20.662C5.06068 19.9099 3.964 18.8924 3.12872 17.6794C2.84945 17.2739 3.0301 16.7138 3.49369 16.5479C7.26112 15.1995 9.27892 13.6369 10.4498 11.4018C11.6825 9.04884 12.001 6.47137 11.1387 2.93837C11.0195 2.44984 11.4053 1.98467 11.9075 2.01161C13.4645 2.09515 14.9856 2.54239 16.3649 3.33878C21.1486 6.10064 22.7876 12.2175 20.0258 17.0012ZM11.7785 12.0979C10.5272 14.4865 8.46706 16.1969 4.96104 17.5968C5.56929 18.2926 6.29275 18.8891 7.1134 19.3629C11.1796 21.7106 16.3791 20.3174 18.7267 16.2512C21.0744 12.1849 19.6812 6.98546 15.6149 4.63782C14.7379 4.13146 13.7951 3.79144 12.8228 3.62229C13.4699 7.00628 13.0525 9.66598 11.7785 12.0979Z" fill="#212121"/> </svg>');
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M20.0258 17.0014C17.2639 21.7851 11.1471 23.4241 6.3634 20.6622C5.06068 19.9101 3.964 18.8926 3.12872 17.6797C2.84945 17.2741 3.0301 16.7141 3.49369 16.5482C7.26112 15.1997 9.27892 13.6372 10.4498 11.4021C11.6825 9.04908 12.001 6.47162 11.1387 2.93862C11.0195 2.45008 11.4053 1.98492 11.9075 2.01186C13.4645 2.09539 14.9856 2.54263 16.3649 3.33903C21.1486 6.10088 22.7876 12.2177 20.0258 17.0014Z" fill="#212121"/> </svg>');
+  @override
+  PathIconData get cornerLine => _cornerLineInstance;
+  static final _cornerLineInstance = PathIconData.fromSvg(
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <path fill-rule="evenodd" clip-rule="evenodd" d="M11.2929 12.7071C11.1054 12.5196 11 12.2652 11 12L11 2C11 1.44772 11.4477 1 12 1C12.5523 1 13 1.44772 13 2L13 11L22 11C22.5523 11 23 11.4477 23 12C23 12.5523 22.5523 13 22 13L12 13C11.7348 13 11.4804 12.8946 11.2929 12.7071Z" fill="black"/> </svg>');
+  @override
+  PathIconData get pointLine => _pointLineInstance;
+  static final _pointLineInstance = PathIconData.fromSvg(
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="3" fill="black"/> </svg>');
 }
 
 class YamlSpacingData {
   const YamlSpacingData({
-    @required this.extraSmall,
-    @required this.small,
-    @required this.semiSmall,
-    @required this.regular,
-    @required this.semiBig,
-    @required this.big,
-    @required this.extraBig,
-  })  : assert(extraSmall != null),
-        assert(small != null),
-        assert(semiSmall != null),
-        assert(regular != null),
-        assert(semiBig != null),
-        assert(big != null),
-        assert(extraBig != null);
+    required this.extraSmall,
+    required this.small,
+    required this.semiSmall,
+    required this.regular,
+    required this.semiBig,
+    required this.big,
+    required this.extraBig,
+  });
 
   const YamlSpacingData.regular()
       : this.extraSmall = 2.00,
@@ -559,13 +578,13 @@ class YamlSpacingData {
   final double extraBig;
 
   YamlSpacingData copyWith({
-    double extraSmall,
-    double small,
-    double semiSmall,
-    double regular,
-    double semiBig,
-    double big,
-    double extraBig,
+    double? extraSmall,
+    double? small,
+    double? semiSmall,
+    double? regular,
+    double? semiBig,
+    double? big,
+    double? extraBig,
   }) =>
       YamlSpacingData(
         extraSmall: extraSmall ?? this.extraSmall,
@@ -602,20 +621,14 @@ class YamlSpacingData {
 
 class YamlEdgeInsetsData {
   const YamlEdgeInsetsData({
-    @required this.extraSmall,
-    @required this.small,
-    @required this.semiSmall,
-    @required this.regular,
-    @required this.semiBig,
-    @required this.big,
-    @required this.extraBig,
-  })  : assert(extraSmall != null),
-        assert(small != null),
-        assert(semiSmall != null),
-        assert(regular != null),
-        assert(semiBig != null),
-        assert(big != null),
-        assert(extraBig != null);
+    required this.extraSmall,
+    required this.small,
+    required this.semiSmall,
+    required this.regular,
+    required this.semiBig,
+    required this.big,
+    required this.extraBig,
+  });
 
   const YamlEdgeInsetsData.regular()
       : this.extraSmall = const EdgeInsets.all(2.00),
@@ -635,13 +648,13 @@ class YamlEdgeInsetsData {
   final EdgeInsets extraBig;
 
   YamlEdgeInsetsData copyWith({
-    EdgeInsets extraSmall,
-    EdgeInsets small,
-    EdgeInsets semiSmall,
-    EdgeInsets regular,
-    EdgeInsets semiBig,
-    EdgeInsets big,
-    EdgeInsets extraBig,
+    EdgeInsets? extraSmall,
+    EdgeInsets? small,
+    EdgeInsets? semiSmall,
+    EdgeInsets? regular,
+    EdgeInsets? semiBig,
+    EdgeInsets? big,
+    EdgeInsets? extraBig,
   }) =>
       YamlEdgeInsetsData(
         extraSmall: extraSmall ?? this.extraSmall,
@@ -678,12 +691,10 @@ class YamlEdgeInsetsData {
 
 class YamlDurationsData {
   const YamlDurationsData({
-    @required this.quick,
-    @required this.regular,
-    @required this.slow,
-  })  : assert(quick != null),
-        assert(regular != null),
-        assert(slow != null);
+    required this.quick,
+    required this.regular,
+    required this.slow,
+  });
 
   const YamlDurationsData.regular()
       : this.quick = const Duration(milliseconds: 100),
@@ -700,9 +711,9 @@ class YamlDurationsData {
   final Duration slow;
 
   YamlDurationsData copyWith({
-    Duration quick,
-    Duration regular,
-    Duration slow,
+    Duration? quick,
+    Duration? regular,
+    Duration? slow,
   }) =>
       YamlDurationsData(
         quick: quick ?? this.quick,
@@ -724,24 +735,16 @@ class YamlDurationsData {
 
 class YamlThemeData {
   const YamlThemeData({
-    @required this.colors,
-    @required this.fontStyles,
-    @required this.fontSizes,
-    @required this.radiuses,
-    @required this.borderRadiuses,
-    @required this.icons,
-    @required this.spacing,
-    @required this.edgeInsets,
-    @required this.durations,
-  })  : assert(colors != null),
-        assert(fontStyles != null),
-        assert(fontSizes != null),
-        assert(radiuses != null),
-        assert(borderRadiuses != null),
-        assert(icons != null),
-        assert(spacing != null),
-        assert(edgeInsets != null),
-        assert(durations != null);
+    required this.colors,
+    required this.fontStyles,
+    required this.fontSizes,
+    required this.radiuses,
+    required this.borderRadiuses,
+    required this.icons,
+    required this.spacing,
+    required this.edgeInsets,
+    required this.durations,
+  });
 
   const YamlThemeData.fallback()
       : this.colors = const YamlColorsData.dark(),
@@ -765,15 +768,15 @@ class YamlThemeData {
   final YamlDurationsData durations;
 
   YamlThemeData copyWith({
-    YamlColorsData colors,
-    YamlFontStylesData fontStyles,
-    YamlFontSizesData fontSizes,
-    YamlRadiusesData radiuses,
-    YamlBorderRadiusesData borderRadiuses,
-    YamlIconsData icons,
-    YamlSpacingData spacing,
-    YamlEdgeInsetsData edgeInsets,
-    YamlDurationsData durations,
+    YamlColorsData? colors,
+    YamlFontStylesData? fontStyles,
+    YamlFontSizesData? fontSizes,
+    YamlRadiusesData? radiuses,
+    YamlBorderRadiusesData? borderRadiuses,
+    YamlIconsData? icons,
+    YamlSpacingData? spacing,
+    YamlEdgeInsetsData? edgeInsets,
+    YamlDurationsData? durations,
   }) =>
       YamlThemeData(
         colors: colors ?? this.colors,

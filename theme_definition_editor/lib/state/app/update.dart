@@ -5,6 +5,8 @@ import 'package:sembast_web/sembast_web.dart';
 import 'package:theme_definition_editor/state/app/state.dart';
 import 'package:theme_definition_editor/state/editor/state.dart';
 
+import 'default_yaml.dart';
+
 abstract class ApplicationUpdate {
   const ApplicationUpdate();
   Stream<ApplicationState> execute(
@@ -24,19 +26,20 @@ class RestoreState extends ApplicationUpdate {
     var db = await f.openDatabase('state');
     var store = StoreRef.main();
 
-    final yaml = await store.record('yaml').get(db) as String;
-    final mode = await store.record('mode').get(db) as int;
+    final yaml = await store.record('yaml').get(db) as String?;
+    final mode = await store.record('mode').get(db) as int?;
     final nullSafety =
-        await store.record('exportOptions.nullSafety').get(db) as bool;
+        await store.record('exportOptions.nullSafety').get(db) as bool?;
 
-    final codeBrightness = await store.record('code_brightness').get(db) as int;
+    final codeBrightness =
+        await store.record('code_brightness').get(db) as int?;
     final previewBrightness =
-        await store.record('preview_brightness').get(db) as int;
+        await store.record('preview_brightness').get(db) as int?;
 
     yield currentState.copyWith(
       editor: EditorState(
-        yaml: yaml ?? '',
-        mode: EditorMode.values[mode ?? EditorMode.preview],
+        yaml: yaml == null || yaml.trim().isEmpty ? defaultYaml.trim() : yaml,
+        mode: EditorMode.values[mode ?? EditorMode.preview.index],
         exportOptions: ExportOptions(
           nullSafety: nullSafety ?? false,
         ),
