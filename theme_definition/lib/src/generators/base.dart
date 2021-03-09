@@ -1,31 +1,9 @@
 import 'package:recase/recase.dart';
+import 'package:theme_definition/src/definitions/configuration.dart';
 import 'package:theme_definition/src/definitions/font_styles.dart';
 import 'package:theme_definition/src/definitions/size.dart';
 import 'package:theme_definition/src/definitions/spacing.dart';
 import 'package:theme_definition/theme_definition.dart';
-
-String createFieldName(String name) {
-  final cased = ReCase(name);
-  return _removeSpecialCharacters(cased.camelCase);
-}
-
-String createClassdName(String name) {
-  final cased = ReCase(name);
-  return _removeSpecialCharacters(cased.pascalCase);
-}
-
-String _removeSpecialCharacters(String value) {
-  final result = StringBuffer();
-  final regexp = RegExp('[a-zA-Z0-9]');
-  for (var i = 0; i < value.length; i++) {
-    final character = value[i];
-    if (regexp.allMatches(character).isNotEmpty) {
-      result.write(character);
-    }
-  }
-
-  return result.toString();
-}
 
 String buildColorInstance(Color value) {
   return 'const Color(0x${value.hexValue})';
@@ -94,8 +72,63 @@ String buildIconInstance(Icon value) {
   return 'PathIconData.from${isSvg ? 'Svg' : 'Data'}(\'${value.data}\')';
 }
 
+String buildBaseValue(Object value) {
+  if (value is String) {
+    return '\'${_escapeString(value)}\'';
+  } else if (value is int) {
+    return '${value.buildDouble()}';
+  } else if (value is double) {
+    return '${value.buildDouble()}';
+  } else if (value is bool) {
+    return '${value ? 'true' : 'false'}';
+  }
+  throw Exception();
+}
+
+String buildConfigurationInstance(Configuration value) =>
+    buildChildConfigurationInstance(value, ['Configuration']);
+
+String buildChildConfigurationInstance(
+    Configuration configuration, List<String> path) {
+  final name = path.map((x) => ReCase(x).pascalCase).join() + 'Data';
+  final result = StringBuffer();
+  result.writeln('const $name(');
+
+  for (var property in configuration.properties.entries) {
+    result.write('${ReCase(property.key).camelCase} : ');
+    result.write(buildBaseValue(property.value));
+    result.writeln(',');
+  }
+
+  for (var property in configuration.children.entries) {
+    final name = ReCase(property.key).camelCase;
+    result.write('${name} : ');
+
+    result.writeln(
+      buildChildConfigurationInstance(
+        property.value,
+        [
+          ...path,
+          property.key,
+        ],
+      ),
+    );
+
+    result.writeln(',');
+  }
+
+  result.writeln(')');
+
+  return result.toString();
+}
+
 extension on num {
   String buildDouble() {
     return toStringAsFixed(2);
   }
 }
+
+String _escapeString(String value) => value
+    .replaceAll('\n', '\\n')
+    .replaceAll('\'', '\\\'')
+    .replaceAll('\$', '\\\$');

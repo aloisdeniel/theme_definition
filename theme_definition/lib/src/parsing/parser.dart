@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:localization_builder/localization_builder.dart';
 import 'package:theme_definition/src/definitions/colors.dart';
+import 'package:theme_definition/src/definitions/configuration.dart';
 import 'package:theme_definition/src/definitions/font_sizes.dart';
 import 'package:theme_definition/src/definitions/font_styles.dart';
 import 'package:theme_definition/src/definitions/icons.dart';
@@ -111,6 +112,7 @@ class ThemeDefinitionParser {
       icons: _parseVariantSets(map, 'icons', _parseIcon),
       durations: _parseVariantSets(map, 'durations', _parseDuration),
       sizes: _parseVariantSets(map, 'sizes', _parseSize),
+      configuration: _parseConfigurationSet(map, 'configuration'),
       labels: _parseLabels(map, 'labels', name),
     );
   }
@@ -126,37 +128,87 @@ class ThemeDefinitionParser {
     final valueMap = entry.value as YamlMap;
     final parser = YamlLocalizationParser();
     try {
-      final result = parser.parse(valueMap);
+      final result = parser.parse(
+        input: valueMap,
+        name: '${name}Labels',
+      );
       for (var token in result.tokens) {
-        _tokens.add(
-          ThemeParsingToken(
-            start: token.node.span.start.offset,
-            end: token.node.span.end.offset,
-            type: () {
-              switch (token.type) {
-                case YamlLocalizationTokenType.sectionKey:
-                  return ThemeParsingTokenType.identifier3;
-                case YamlLocalizationTokenType.caseKey:
-                case YamlLocalizationTokenType.labelKey:
-                  return ThemeParsingTokenType.identifier4;
-                case YamlLocalizationTokenType.languageKey:
-                  return ThemeParsingTokenType.identifier2;
-                case YamlLocalizationTokenType.labelValue:
-                  return ThemeParsingTokenType.stringValue;
-                case YamlLocalizationTokenType.caseValue:
-                  return ThemeParsingTokenType.stringValue;
-                default:
-                  return ThemeParsingTokenType.text;
-              }
-            }(),
-          ),
-        );
+        if (token.node != null) {
+          _tokens.add(
+            ThemeParsingToken(
+              start: token.node!.span.start.offset,
+              end: token.node!.span.end.offset,
+              type: () {
+                switch (token.type) {
+                  case YamlLocalizationTokenType.sectionKey:
+                    return ThemeParsingTokenType.identifier3;
+                  case YamlLocalizationTokenType.caseKey:
+                  case YamlLocalizationTokenType.labelKey:
+                    return ThemeParsingTokenType.identifier4;
+                  case YamlLocalizationTokenType.languageKey:
+                    return ThemeParsingTokenType.identifier2;
+                  case YamlLocalizationTokenType.labelValue:
+                    return ThemeParsingTokenType.stringValue;
+                  case YamlLocalizationTokenType.caseValue:
+                    return ThemeParsingTokenType.stringValue;
+                  default:
+                    return ThemeParsingTokenType.text;
+                }
+              }(),
+            ),
+          );
+        }
       }
 
       return result.result.copyWith(name: '${themeName}LocalizationData');
     } on ParsingException<YamlLocalizationToken> catch (e) {
-      throw ThemeDefinitionParsingException.fromNode(e.token.node, e.message);
+      if (e.token.node != null) {
+        throw ThemeDefinitionParsingException.fromNode(
+            e.token.node!, e.message);
+      } else {
+        rethrow;
+      }
     }
+  }
+
+  List<ConfigurationSet> _parseConfigurationSet(YamlMap map, String name) {
+    final variants = map[name];
+    _addKeyTokenWithName(map, name, ThemeParsingTokenType.identifier1);
+    if (!(variants == null || variants is YamlMap)) {
+      throw ThemeDefinitionParsingException.fromNode(
+        variants,
+        'Should be a map of variants',
+      );
+    }
+    final result = <ConfigurationSet>[];
+    if (variants != null) {
+      ConfigurationSet? previousVariant;
+      for (var entry in variants.nodes.entries) {
+        _addKeyToken(entry.key, ThemeParsingTokenType.identifier2);
+        if (!(entry.value is YamlMap)) {
+          throw ThemeDefinitionParsingException.fromNode(
+            entry.value,
+            'Expecting a map with "$name" constants for the "${entry.key}" variant',
+          );
+        }
+        final map = entry.value as YamlMap;
+        final config = _parseConfiguration(map);
+        if (previousVariant != null &&
+            !config.hasSameProperties(previousVariant.configuration)) {
+          throw ThemeDefinitionParsingException.fromNode(
+            entry.key,
+            'This variant doesn\' have the same constants than the previous one',
+          );
+        }
+        final variant = ConfigurationSet(
+          name: entry.key.toString(),
+          configuration: config,
+        );
+        result.add(variant);
+        previousVariant = variant;
+      }
+    }
+    return result;
   }
 
   List<VariantSet<T>> _parseVariantSets<T>(
@@ -166,7 +218,7 @@ class ThemeDefinitionParser {
     if (!(variants == null || variants is YamlMap)) {
       throw ThemeDefinitionParsingException.fromNode(
         variants,
-        'Should be a map of icons variants',
+        'Should be a map of variants',
       );
     }
     final result = <VariantSet<T>>[];
@@ -210,6 +262,37 @@ class ThemeDefinitionParser {
           );
         },
       ).toList(),
+    );
+  }
+
+  Configuration _parseConfiguration(YamlNode value) {
+    if (!(value is YamlMap)) {
+      throw ThemeDefinitionParsingException.fromNode(
+        value,
+        'Expecting a map for the configuration item',
+      );
+    }
+
+    // Properties
+    final properties = <String, Object>{};
+    final scalarNodes =
+        value.nodes.entries.where((x) => x.value is YamlScalar).toList();
+    for (var scalarNodes in scalarNodes) {
+      properties[scalarNodes.key.toString()] =
+          (scalarNodes.value as YamlScalar).value;
+    }
+
+    // Children
+    final children = <String, Configuration>{};
+    final mapNodes =
+        value.nodes.entries.where((x) => x.value is YamlMap).toList();
+    for (var mapNode in mapNodes) {
+      children[mapNode.key.toString()] = _parseConfiguration(mapNode.value);
+    }
+
+    return Configuration(
+      properties: properties,
+      children: children,
     );
   }
 
@@ -281,9 +364,9 @@ class ThemeDefinitionParser {
   }
 
   Size _parseSize(YamlNode value) {
-    if (value is YamlScalar && value.value is double) {
+    if (value is YamlScalar && value.value is num) {
       _addValueToken(value, ThemeParsingTokenType.doubleValue);
-      final size = value.value as double;
+      final size = (value.value as num).toDouble();
       return Size(size, size);
     }
     final map = value as YamlMap;

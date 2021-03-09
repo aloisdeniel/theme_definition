@@ -7,6 +7,7 @@ export 'src/definitions/colors.dart';
 export 'src/definitions/font_styles.dart';
 export 'src/definitions/spacing.dart';
 export 'src/definitions/radius.dart';
+export 'src/definitions/configuration.dart';
 export 'src/definitions/icons.dart';
 export 'src/definitions/size.dart';
 export 'src/definitions/font_sizes.dart';

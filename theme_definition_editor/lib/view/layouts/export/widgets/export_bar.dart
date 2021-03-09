@@ -45,6 +45,26 @@ class ExportEditorBar extends StatelessWidget {
               fontSize: theme.fontSizes.regular,
             ),
           ),
+          SizedBox(width: theme.spacing.regular),
+          Checkbox(
+            isSelected: exportOptions.jsonParser,
+            onSelectedChanged: (value) => context.dispatch(
+              ChangeExportOptions(
+                exportOptions.copyWith(
+                  jsonParser: value,
+                ),
+              ),
+            ),
+            icon: theme.icons.checkmark,
+          ),
+          SizedBox(width: theme.spacing.regular),
+          Text(
+            'Json parsers',
+            style: theme.fontStyles.content.copyWith(
+              color: theme.colors.foreground1,
+              fontSize: theme.fontSizes.regular,
+            ),
+          ),
           Spacer(),
           ActionButton(
             onTap: () => context.dispatch(CopyCodeToClipboard()),

@@ -1,6 +1,5 @@
+import 'package:dart_style/dart_style.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:theme_definition/theme_definition.dart';
 
 enum EditorMode {
@@ -29,7 +28,8 @@ class EditorState extends Equatable {
         codeBrightness = BrightnessMode.dark,
         previewBrightness = BrightnessMode.light,
         exportOptions = const ExportOptions(
-          nullSafety: false,
+          nullSafety: true,
+          jsonParser: true,
         ),
         exportedCode = const ExportedCode(
           dart: '',
@@ -53,7 +53,8 @@ class EditorState extends Equatable {
     required BrightnessMode codeBrightness,
     required BrightnessMode previewBrightness,
     ExportOptions exportOptions = const ExportOptions(
-      nullSafety: false,
+      nullSafety: true,
+      jsonParser: true,
     ),
   }) {
     final parsingResult = ThemeDefinitionParser().parseYaml(yaml);
@@ -62,6 +63,7 @@ class EditorState extends Equatable {
       succeeded: (succeeded) => generateTheme(
         succeeded.definition,
         nullSafety: exportOptions.nullSafety,
+        jsonParser: exportOptions.jsonParser,
       ),
       failed: (failed) => '',
     );
@@ -70,7 +72,7 @@ class EditorState extends Equatable {
       yaml: yaml,
       mode: mode,
       exportOptions: exportOptions,
-      exportedCode: ExportedCode(
+      exportedCode: ExportedCode.formatted(
         dart: dart,
         copiedToCliboard: false,
       ),
@@ -123,21 +125,25 @@ class EditorState extends Equatable {
 
 class ExportOptions extends Equatable {
   final bool nullSafety;
+  final bool jsonParser;
 
   const ExportOptions({
     required this.nullSafety,
+    required this.jsonParser,
   });
 
   ExportOptions copyWith({
     bool? nullSafety,
+    bool? jsonParser,
   }) =>
       ExportOptions(
-        nullSafety: nullSafety ?? this.nullSafety,
-      );
+          nullSafety: nullSafety ?? this.nullSafety,
+          jsonParser: jsonParser ?? this.jsonParser);
 
   @override
   List<Object> get props => [
         nullSafety,
+        jsonParser,
       ];
 }
 
@@ -148,6 +154,16 @@ class ExportedCode extends Equatable {
     required this.dart,
     required this.copiedToCliboard,
   });
+
+  factory ExportedCode.formatted({
+    required String dart,
+    required bool copiedToCliboard,
+  }) {
+    return ExportedCode(
+      dart: DartFormatter().format(dart),
+      copiedToCliboard: copiedToCliboard,
+    );
+  }
 
   ExportedCode copyWith({
     String? dart,

@@ -9,14 +9,20 @@
             "cwd": "theme_definition/example",
             "request": "launch",
             "program": "example.dart",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--no-sound-null-safety"
+            ]
         },
         {
             "name": "Editor",
             "cwd": "theme_definition_editor",
             "request": "launch",
             "program": "lib/main.dart",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--no-sound-null-safety"
+            ]
         }
     ]
 }

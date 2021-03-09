@@ -67,4 +67,9 @@ class FailedThemeParsingResult extends ThemeParsingResult {
         ...super.props,
         exception,
       ];
+
+  @override
+  String toString() {
+    return exception.toString();
+  }
 }

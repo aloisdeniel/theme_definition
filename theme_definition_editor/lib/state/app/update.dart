@@ -30,6 +30,8 @@ class RestoreState extends ApplicationUpdate {
     final mode = await store.record('mode').get(db) as int?;
     final nullSafety =
         await store.record('exportOptions.nullSafety').get(db) as bool?;
+    final jsonParser =
+        await store.record('exportOptions.jsonParser').get(db) as bool?;
 
     final codeBrightness =
         await store.record('code_brightness').get(db) as int?;
@@ -41,7 +43,8 @@ class RestoreState extends ApplicationUpdate {
         yaml: yaml == null || yaml.trim().isEmpty ? defaultYaml.trim() : yaml,
         mode: EditorMode.values[mode ?? EditorMode.preview.index],
         exportOptions: ExportOptions(
-          nullSafety: nullSafety ?? false,
+          nullSafety: nullSafety ?? true,
+          jsonParser: jsonParser ?? true,
         ),
         codeBrightness:
             BrightnessMode.values[codeBrightness ?? BrightnessMode.dark.index],
@@ -76,6 +79,9 @@ class SaveState extends ApplicationUpdate {
     await store
         .record('exportOptions.nullSafety')
         .put(db, currentState.editor.exportOptions.nullSafety);
+    await store
+        .record('exportOptions.jsonParser')
+        .put(db, currentState.editor.exportOptions.jsonParser);
     print('Saved state to storage');
   }
 }

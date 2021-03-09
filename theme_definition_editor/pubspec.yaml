@@ -14,8 +14,9 @@ dependencies:
   equatable: ^2.0.0-nullsafety.3
   google_fonts: ^2.0.0
   path_icon: ^0.7.0
+  dart_style: 
   theme_definition:
-    path: ../theme_definition
+    path: ../theme_definition 
   flutter:
     sdk: flutter
 

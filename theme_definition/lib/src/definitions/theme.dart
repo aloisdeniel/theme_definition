@@ -6,6 +6,7 @@ import 'package:theme_definition/src/definitions/radius.dart';
 import 'package:theme_definition/src/definitions/spacing.dart';
 import 'package:theme_definition/theme_definition.dart';
 
+import 'configuration.dart';
 import 'font_styles.dart';
 import 'icons.dart';
 import 'size.dart';
@@ -22,6 +23,7 @@ class ThemeDefinition extends Equatable {
     required this.durations,
     required this.sizes,
     required this.labels,
+    required this.configuration,
   });
 
   factory ThemeDefinition.empty() => ThemeDefinition(
@@ -34,6 +36,7 @@ class ThemeDefinition extends Equatable {
         icons: const <VariantSet<Icon>>[],
         durations: const <VariantSet<Duration>>[],
         sizes: const <VariantSet<Size>>[],
+        configuration: const <ConfigurationSet>[],
         labels: null,
       );
 
@@ -46,6 +49,7 @@ class ThemeDefinition extends Equatable {
   final List<VariantSet<Icon>> icons;
   final List<VariantSet<Duration>> durations;
   final List<VariantSet<Size>> sizes;
+  final List<ConfigurationSet> configuration;
   final Localizations? labels;
 
   @override
@@ -59,6 +63,7 @@ class ThemeDefinition extends Equatable {
         icons,
         durations,
         sizes,
+        configuration,
         labels,
       ];
 }
@@ -76,6 +81,18 @@ class VariantSet<T> extends Equatable {
 
   @override
   List<Object?> get props => [name, constants];
+}
+
+class ConfigurationSet extends Equatable {
+  const ConfigurationSet({
+    required this.name,
+    required this.configuration,
+  });
+  final String name;
+  final Configuration configuration;
+
+  @override
+  List<Object?> get props => [name, configuration];
 }
 
 class ConstantDefinition<T> extends Equatable {

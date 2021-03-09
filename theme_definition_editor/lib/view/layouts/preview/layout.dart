@@ -7,6 +7,7 @@ import 'package:localization_builder/localization_builder.dart'
     as localization_builder;
 import 'package:theme_definition_editor/state/app/state.dart';
 import 'package:theme_definition_editor/view/layouts/preview/widgets/colors.dart';
+import 'package:theme_definition_editor/view/layouts/preview/widgets/configuration.dart';
 import 'package:theme_definition_editor/view/layouts/preview/widgets/durations.dart';
 import 'package:theme_definition_editor/view/layouts/preview/widgets/font_sizes.dart';
 import 'package:theme_definition_editor/view/layouts/preview/widgets/font_styles.dart';
@@ -113,6 +114,11 @@ class ThemePreviewLayout extends StatelessWidget {
             _LabelsSection(
               title: 'Labels',
               localizations: definition.labels!,
+            ),
+          if (definition.configuration.isNotEmpty)
+            _ConfigurationSection(
+              title: 'Configuration',
+              variants: definition.configuration,
             ),
         ],
       ),
@@ -337,6 +343,153 @@ class _LabelsSection extends StatelessWidget {
                   ],
                 ),
                 ..._labels(context, localizations, 0),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ConfigurationSection extends StatelessWidget {
+  const _ConfigurationSection({
+    Key? key,
+    required this.title,
+    required this.variants,
+  }) : super(key: key);
+
+  final String title;
+  final List<ConfigurationSet> variants;
+
+  Iterable<Widget> _properties(
+    BuildContext context,
+    Configuration config,
+    List<String> path,
+  ) sync* {
+    final theme = YamlTheme.of(context);
+
+    for (var property in config.properties.entries) {
+      final propertyPath = [
+        ...path,
+        property.key,
+      ];
+      yield Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: ConfigurationTile(
+          path: propertyPath,
+          variants: variants,
+          key: ValueKey(propertyPath.join('.')),
+        ),
+      );
+    }
+
+    for (var child in config.children.entries) {
+      yield Padding(
+        padding: EdgeInsets.only(top: theme.spacing.regular),
+        child: SizedBox(
+          width: 200,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ...Iterable.generate(
+                path.length,
+                (i) => PathIcon(
+                  theme.icons.pointLine,
+                  size: theme.fontSizes.regular,
+                  color: theme.colors.foreground2.withOpacity(0.3),
+                ),
+              ),
+              if (path.length > 0) ...[
+                PathIcon(
+                  theme.icons.cornerLine,
+                  size: theme.fontSizes.regular,
+                  color: theme.colors.foreground2,
+                ),
+                SizedBox(width: theme.spacing.semiSmall),
+              ],
+              Text(
+                child.key,
+                style: theme.fontStyles.content.copyWith(
+                  color: theme.colors.foreground1,
+                  fontSize: theme.fontSizes.regular,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      yield* _properties(
+        context,
+        child.value,
+        [
+          ...path,
+          child.key,
+        ],
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (variants.isEmpty && variants.isEmpty) {
+      return SizedBox();
+    }
+    final theme = YamlTheme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 12.0,
+        right: 12.0,
+        bottom: 32.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.fontStyles.title.copyWith(
+              color: theme.colors.foreground1,
+              fontSize: theme.fontSizes.big,
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 200,
+                    ),
+                    ...variants.map(
+                      (variant) => SizedBox(
+                        width: 200,
+                        child: Center(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: theme.colors.background2,
+                              borderRadius: theme.borderRadiuses.big,
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: theme.spacing.small,
+                              horizontal: theme.spacing.semiBig,
+                            ),
+                            child: Text(
+                              variant.name,
+                              textAlign: TextAlign.center,
+                              style: theme.fontStyles.content.copyWith(
+                                color: theme.colors.foreground1,
+                                fontSize: theme.fontSizes.regular,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                ..._properties(context, variants.first.configuration, []),
               ],
             ),
           ),

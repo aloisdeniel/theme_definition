@@ -29,4 +29,9 @@ class ThemeDefinitionParsingException extends Equatable {
 
   @override
   List<Object?> get props => [startOffset, endOffset, message];
+
+  @override
+  String toString() {
+    return 'ParsingException at line $startLine, column: $startColumn : $message';
+  }
 }

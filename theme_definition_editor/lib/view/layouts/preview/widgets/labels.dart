@@ -133,7 +133,7 @@ class LabelTile extends StatelessWidget {
                         if (condition
                             is localization_builder.CategoryCondition) ...[
                           Text(
-                            '${condition.category.name}.${condition.value}',
+                            '${condition.name}.${condition.value}',
                             style: theme.fontStyles.content.copyWith(
                               color: theme.colors.foreground3,
                               fontSize: theme.fontSizes.small,

@@ -1,3 +1,10 @@
+// /!\ GENERATED CODE : DO NOT MODIFY BY HAND
+//
+// If you need to update the theme, modify the 'yaml' file instead
+// and export a new version.
+//
+// Online editor: https://yaml-theme.web.app/
+
 import 'package:flutter/widgets.dart';
 import 'package:path_icon/path_icon.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -88,6 +95,17 @@ class YamlColorsData {
   final Color foreground3;
   final Color error1;
   final Color error2;
+  factory YamlColorsData.fromJson(Map<String, Object?> map) => YamlColorsData(
+        accent1: _parseColor(map['accent1']!),
+        accent2: _parseColor(map['accent2']!),
+        background1: _parseColor(map['background1']!),
+        background2: _parseColor(map['background2']!),
+        foreground1: _parseColor(map['foreground1']!),
+        foreground2: _parseColor(map['foreground2']!),
+        foreground3: _parseColor(map['foreground3']!),
+        error1: _parseColor(map['error1']!),
+        error2: _parseColor(map['error2']!),
+      );
 
   YamlColorsData copyWith({
     Color? accent1,
@@ -160,6 +178,12 @@ class YamlFontStylesData {
   TextStyle get content => _content!;
   final TextStyle? _code;
   TextStyle get code => _code!;
+  factory YamlFontStylesData.fromJson(Map<String, Object?> map) =>
+      YamlFontStylesData(
+        title: _parseTextStyle(map['title']!),
+        content: _parseTextStyle(map['content']!),
+        code: _parseTextStyle(map['code']!),
+      );
 
   YamlFontStylesData copyWith({
     TextStyle? title,
@@ -231,6 +255,14 @@ class YamlFontSizesData {
   final double regular;
   final double semiBig;
   final double big;
+  factory YamlFontSizesData.fromJson(Map<String, Object?> map) =>
+      YamlFontSizesData(
+        small: (map['small']! as num).toDouble(),
+        semiSmall: (map['semiSmall']! as num).toDouble(),
+        regular: (map['regular']! as num).toDouble(),
+        semiBig: (map['semiBig']! as num).toDouble(),
+        big: (map['big']! as num).toDouble(),
+      );
 
   YamlFontSizesData copyWith({
     double? small,
@@ -284,6 +316,13 @@ class YamlRadiusesData {
   final Radius regular;
   final Radius big;
   final Radius extraBig;
+  factory YamlRadiusesData.fromJson(Map<String, Object?> map) =>
+      YamlRadiusesData(
+        small: _parseRadius(map['small']!),
+        regular: _parseRadius(map['regular']!),
+        big: _parseRadius(map['big']!),
+        extraBig: _parseRadius(map['extraBig']!),
+      );
 
   YamlRadiusesData copyWith({
     Radius? small,
@@ -333,6 +372,13 @@ class YamlBorderRadiusesData {
   final BorderRadius regular;
   final BorderRadius big;
   final BorderRadius extraBig;
+  factory YamlBorderRadiusesData.fromJson(Map<String, Object?> map) =>
+      YamlBorderRadiusesData(
+        small: _parseBorderRadius(map['small']!),
+        regular: _parseBorderRadius(map['regular']!),
+        big: _parseBorderRadius(map['big']!),
+        extraBig: _parseBorderRadius(map['extraBig']!),
+      );
 
   YamlBorderRadiusesData copyWith({
     BorderRadius? small,
@@ -416,6 +462,17 @@ class YamlIconsData {
   PathIconData get cornerLine => _cornerLine!;
   final PathIconData? _pointLine;
   PathIconData get pointLine => _pointLine!;
+  factory YamlIconsData.fromJson(Map<String, Object?> map) => YamlIconsData(
+        palette: _parsePathIconData(map['palette']!),
+        exportCode: _parsePathIconData(map['exportCode']!),
+        checkmark: _parsePathIconData(map['checkmark']!),
+        clipboard: _parsePathIconData(map['clipboard']!),
+        textEdit: _parsePathIconData(map['textEdit']!),
+        sun: _parsePathIconData(map['sun']!),
+        moon: _parsePathIconData(map['moon']!),
+        cornerLine: _parsePathIconData(map['cornerLine']!),
+        pointLine: _parsePathIconData(map['pointLine']!),
+      );
 
   YamlIconsData copyWith({
     PathIconData? palette,
@@ -576,6 +633,15 @@ class YamlSpacingData {
   final double semiBig;
   final double big;
   final double extraBig;
+  factory YamlSpacingData.fromJson(Map<String, Object?> map) => YamlSpacingData(
+        extraSmall: (map['extraSmall']! as num).toDouble(),
+        small: (map['small']! as num).toDouble(),
+        semiSmall: (map['semiSmall']! as num).toDouble(),
+        regular: (map['regular']! as num).toDouble(),
+        semiBig: (map['semiBig']! as num).toDouble(),
+        big: (map['big']! as num).toDouble(),
+        extraBig: (map['extraBig']! as num).toDouble(),
+      );
 
   YamlSpacingData copyWith({
     double? extraSmall,
@@ -646,6 +712,16 @@ class YamlEdgeInsetsData {
   final EdgeInsets semiBig;
   final EdgeInsets big;
   final EdgeInsets extraBig;
+  factory YamlEdgeInsetsData.fromJson(Map<String, Object?> map) =>
+      YamlEdgeInsetsData(
+        extraSmall: _parseEdgeInsets(map['extraSmall']!),
+        small: _parseEdgeInsets(map['small']!),
+        semiSmall: _parseEdgeInsets(map['semiSmall']!),
+        regular: _parseEdgeInsets(map['regular']!),
+        semiBig: _parseEdgeInsets(map['semiBig']!),
+        big: _parseEdgeInsets(map['big']!),
+        extraBig: _parseEdgeInsets(map['extraBig']!),
+      );
 
   YamlEdgeInsetsData copyWith({
     EdgeInsets? extraSmall,
@@ -709,6 +785,12 @@ class YamlDurationsData {
   final Duration quick;
   final Duration regular;
   final Duration slow;
+  factory YamlDurationsData.fromJson(Map<String, Object?> map) =>
+      YamlDurationsData(
+        quick: _parseDuration(map['quick']!),
+        regular: _parseDuration(map['regular']!),
+        slow: _parseDuration(map['slow']!),
+      );
 
   YamlDurationsData copyWith({
     Duration? quick,
@@ -766,6 +848,24 @@ class YamlThemeData {
   final YamlSpacingData spacing;
   final YamlEdgeInsetsData edgeInsets;
   final YamlDurationsData durations;
+  factory YamlThemeData.fromJson(Map<String, Object?> map) => YamlThemeData(
+        colors: YamlColorsData.fromJson(map['colors']! as Map<String, Object?>),
+        fontStyles: YamlFontStylesData.fromJson(
+            map['fontStyles']! as Map<String, Object?>),
+        fontSizes: YamlFontSizesData.fromJson(
+            map['fontSizes']! as Map<String, Object?>),
+        radiuses:
+            YamlRadiusesData.fromJson(map['radiuses']! as Map<String, Object?>),
+        borderRadiuses: YamlBorderRadiusesData.fromJson(
+            map['borderRadiuses']! as Map<String, Object?>),
+        icons: YamlIconsData.fromJson(map['icons']! as Map<String, Object?>),
+        spacing:
+            YamlSpacingData.fromJson(map['spacing']! as Map<String, Object?>),
+        edgeInsets: YamlEdgeInsetsData.fromJson(
+            map['edgeInsets']! as Map<String, Object?>),
+        durations: YamlDurationsData.fromJson(
+            map['durations']! as Map<String, Object?>),
+      );
 
   YamlThemeData copyWith({
     YamlColorsData? colors,
@@ -815,4 +915,141 @@ class YamlThemeData {
       spacing.hashCode ^
       edgeInsets.hashCode ^
       durations.hashCode;
+}
+
+EdgeInsets _parseEdgeInsets(Object value) {
+  if (value is String) {
+    value = int.parse(value);
+  }
+  if (!(value is num)) throw Exception();
+  return EdgeInsets.all(value.toDouble());
+}
+
+Color _parseColor(Object value) {
+  if (!(value is String)) throw Exception();
+  if (value.startsWith('#')) {
+    value = value.substring(1);
+  }
+  return Color(int.parse(_uniformizeHexValue(value), radix: 16));
+}
+
+String _uniformizeHexValue(String? hex) {
+  hex ??= '0';
+  hex = hex.isEmpty ? '0' : hex;
+  if (hex.length == 1) {
+    return 'FF$hex$hex$hex$hex$hex$hex';
+  } else if (hex.length == 2) {
+    return 'FF$hex$hex$hex';
+  } else if (hex.length == 3) {
+    final r = hex[0];
+    final g = hex[1];
+    final b = hex[2];
+    return 'FF$r$r$g$g$b$b';
+  } else if (hex.length == 4) {
+    final a = hex[0];
+    final r = hex[1];
+    final g = hex[2];
+    final b = hex[3];
+    return '$a$a$r$r$g$g$b$b';
+  } else if (hex.length == 5) {
+    final a1 = hex[0];
+    final a2 = hex[1];
+    final r = hex[2];
+    final g = hex[3];
+    final b = hex[4];
+    return '$a1$a2$r$r$g$g$b$b';
+  } else if (hex.length == 6) {
+    return 'FF$hex';
+  } else if (hex.length == 7) {
+    final a = hex[0];
+    final rgb = hex.substring(1);
+    return '$a$a$rgb';
+  }
+  return hex.substring(0, 8);
+}
+
+Radius _parseRadius(Object value) {
+  if (value is String) {
+    value = int.parse(value);
+  }
+  if (!(value is num)) throw Exception();
+  return Radius.circular(value.toDouble());
+}
+
+BorderRadius _parseBorderRadius(Object value) {
+  if (value is String) {
+    value = int.parse(value);
+  }
+  if (!(value is num)) throw Exception();
+  return BorderRadius.circular(value.toDouble());
+}
+
+Duration _parseDuration(Object value) {
+  if (value is String) {
+    value = int.parse(value);
+  }
+
+  if (value is num) {
+    return Duration(milliseconds: value.toInt());
+  }
+
+  if (value is Map<String, Object?>) {
+    final milliseconds = value['milliseconds'] ?? 0;
+    final seconds = value['seconds'] ?? 0;
+    final minutes = value['minutes'] ?? 0;
+    final hours = value['hours'] ?? 0;
+    return Duration(
+      milliseconds: (milliseconds as num).toInt(),
+      seconds: (seconds as num).toInt(),
+      minutes: (minutes as num).toInt(),
+      hours: (hours as num).toInt(),
+    );
+  }
+
+  throw Exception();
+}
+
+TextStyle _parseTextStyle(Object value) {
+  if (!(value is Map<String, Object?>)) throw Exception();
+  final source = value['source'] as String?;
+  final fontFamily = value['fontFamily'] as String?;
+  final TextDecoration decoration = () {
+    final v = value['decoration'] as String?;
+    switch (v) {
+      case 'overline':
+        return TextDecoration.overline;
+      case 'underline':
+        return TextDecoration.underline;
+      default:
+        return TextDecoration.none;
+    }
+  }();
+  final FontWeight? fontWeight = () {
+    final weight = (value['fontWeight'] as num?)?.toInt();
+    if (weight == null) {
+      return null;
+    }
+    return FontWeight.values[(weight ~/ 100) + 1];
+  }();
+  final fontSize = (value['fontSize'] as num?)?.toDouble();
+  if (source != null && source.toLowerCase() == 'googlefonts') {
+    return GoogleFonts.getFont(
+      source,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      decoration: decoration,
+    );
+  }
+  return TextStyle(
+    fontFamily: fontFamily,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    decoration: decoration,
+  );
+}
+
+PathIconData _parsePathIconData(Object value) {
+  if (!(value is String)) throw Exception();
+  if (value.contains('<svg')) return PathIconData.fromSvg(value);
+  return PathIconData.fromData(value);
 }
