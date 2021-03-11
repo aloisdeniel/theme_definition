@@ -1,6 +1,7 @@
 import 'package:recase/recase.dart';
 import 'package:theme_definition/src/definitions/configuration.dart';
 import 'package:theme_definition/src/definitions/font_styles.dart';
+import 'package:theme_definition/src/definitions/images.dart';
 import 'package:theme_definition/src/definitions/size.dart';
 import 'package:theme_definition/src/definitions/spacing.dart';
 import 'package:theme_definition/theme_definition.dart';
@@ -70,6 +71,15 @@ String buildFontStyleInstance(FontStyle value) {
 String buildIconInstance(Icon value) {
   final isSvg = value.data.toLowerCase().contains('<svg');
   return 'PathIconData.from${isSvg ? 'Svg' : 'Data'}(\'${value.data}\')';
+}
+
+String buildImageInstance(Image value) {
+  switch (value.source) {
+    case ImageSource.asset:
+      return 'AssetImage(\'${value.path}\')';
+    default:
+      return 'NetworkImage(\'${value.path}\')';
+  }
 }
 
 String buildBaseValue(Object value) {

@@ -22,6 +22,7 @@ class YamlEditor extends StatelessWidget {
       fontSize: theme.fontSizes.regular,
     );
     switch (type) {
+      case d.ThemeParsingTokenType.boolValue:
       case d.ThemeParsingTokenType.doubleValue:
         return baseStyle.copyWith(color: theme.colors.accent1);
       case d.ThemeParsingTokenType.stringValue:

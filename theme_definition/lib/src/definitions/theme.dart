@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:localization_builder/localization_builder.dart';
 import 'package:theme_definition/src/definitions/colors.dart';
 import 'package:theme_definition/src/definitions/font_sizes.dart';
+import 'package:theme_definition/src/definitions/images.dart';
 import 'package:theme_definition/src/definitions/radius.dart';
 import 'package:theme_definition/src/definitions/spacing.dart';
 import 'package:theme_definition/theme_definition.dart';
@@ -24,6 +25,7 @@ class ThemeDefinition extends Equatable {
     required this.sizes,
     required this.labels,
     required this.configuration,
+    required this.images,
   });
 
   factory ThemeDefinition.empty() => ThemeDefinition(
@@ -34,6 +36,7 @@ class ThemeDefinition extends Equatable {
         fontSizes: const <VariantSet<FontSize>>[],
         radiuses: const <VariantSet<Radius>>[],
         icons: const <VariantSet<Icon>>[],
+        images: const <VariantSet<Image>>[],
         durations: const <VariantSet<Duration>>[],
         sizes: const <VariantSet<Size>>[],
         configuration: const <ConfigurationSet>[],
@@ -47,6 +50,7 @@ class ThemeDefinition extends Equatable {
   final List<VariantSet<FontSize>> fontSizes;
   final List<VariantSet<Radius>> radiuses;
   final List<VariantSet<Icon>> icons;
+  final List<VariantSet<Image>> images;
   final List<VariantSet<Duration>> durations;
   final List<VariantSet<Size>> sizes;
   final List<ConfigurationSet> configuration;

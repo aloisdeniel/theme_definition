@@ -23,6 +23,7 @@ const parserMethods = <String, TypeParserMethod>{
   'Radius': _radiusParser,
   'BorderRadius': _borderRadiusParser,
   'TextStyle': _textStyleParser,
+  'ImageProvider': _imageParser,
   'PathIconData': _pathIconDataParser,
   'Size': _sizeParser,
   'Duration': _durationParser,
@@ -51,6 +52,32 @@ Size _parseSize(Object value) {
   }
 
   throw Exception();
+}
+''';
+
+String _imageParser({
+  required bool nullSafety,
+}) =>
+    r'''
+ImageProvider _parseImage(Object value) {
+  if (!(value is Map<String, Object'''
+    '${nullSafety ? '?' : ''}'
+    r'''>)) throw Exception();
+  final source = value['source'] as String'''
+    '${nullSafety ? '?' : ''}'
+    ''';
+  final path = value['path'] as String'''
+    '${nullSafety ? '?' : ''}'
+    ''';
+  final url = value['url'] as String'''
+    '${nullSafety ? '?' : ''}'
+    ''';
+
+  if(source == 'asset') {
+    return AssetImage(path ?? url);
+  }
+
+  return NetworkImage(path ?? url);
 }
 ''';
 
@@ -118,10 +145,16 @@ TextStyle _parseTextStyle(Object value) {
   if (!(value is Map<String, Object'''
     '${nullSafety ? '?' : ''}'
     r'''>)) throw Exception();
-  final source = value['source'] as String?;
-  final fontFamily = value['fontFamily'] as String?;
+  final source = value['source'] as String'''
+    '${nullSafety ? '?' : ''}'
+    ''';
+  final fontFamily = value['fontFamily'] as String'''
+    '${nullSafety ? '?' : ''}'
+    ''';
   final TextDecoration decoration = () {
-    final v = value['decoration'] as String?;
+    final v = value['decoration'] as String'''
+    '${nullSafety ? '?' : ''}'
+    ''';
     switch (v) {
       case 'overline':
         return TextDecoration.overline;
@@ -136,12 +169,12 @@ TextStyle _parseTextStyle(Object value) {
     if (weight == null) {
       return null;
     }
-    return FontWeight.values[(weight ~/ 100) + 1];
+    return FontWeight.values[(weight ~/ 100) - 1];
   }();
   final fontSize = (value['fontSize'] as num?)?.toDouble();
-  if (source != null && source.toLowerCase() == 'googlefonts') {
+  if (source != null && source.toLowerCase() == 'googlefonts' && fontFamily != null) {
     return GoogleFonts.getFont(
-      source,
+      fontFamily,
       fontSize: fontSize,
       fontWeight: fontWeight,
       decoration: decoration,

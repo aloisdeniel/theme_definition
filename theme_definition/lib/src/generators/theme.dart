@@ -156,6 +156,12 @@ String generateTheme(
     'Duration',
     buildDurationInstance,
   );
+  addData(
+    definition.images,
+    'images',
+    'ImageProvider',
+    buildImageInstance,
+  );
 
   addConfigurationData(
     prefix,
@@ -221,6 +227,10 @@ String generateTheme(
 
     if (definition.icons.isNotEmpty) {
       result.writeln(parserMethods['PathIconData']!(nullSafety: nullSafety));
+    }
+
+    if (definition.images.isNotEmpty) {
+      result.writeln(parserMethods['ImageProvider']!(nullSafety: nullSafety));
     }
   }
 

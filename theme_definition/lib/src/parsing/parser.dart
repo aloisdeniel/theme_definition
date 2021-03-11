@@ -6,6 +6,7 @@ import 'package:theme_definition/src/definitions/configuration.dart';
 import 'package:theme_definition/src/definitions/font_sizes.dart';
 import 'package:theme_definition/src/definitions/font_styles.dart';
 import 'package:theme_definition/src/definitions/icons.dart';
+import 'package:theme_definition/src/definitions/images.dart';
 import 'package:theme_definition/src/definitions/radius.dart';
 import 'package:theme_definition/src/definitions/size.dart';
 import 'package:theme_definition/src/definitions/spacing.dart';
@@ -110,6 +111,7 @@ class ThemeDefinitionParser {
       fontSizes: _parseVariantSets(map, 'fontSizes', _parseFontSize),
       radiuses: _parseVariantSets(map, 'radiuses', _parseRadius),
       icons: _parseVariantSets(map, 'icons', _parseIcon),
+      images: _parseVariantSets(map, 'images', _parseImage),
       durations: _parseVariantSets(map, 'durations', _parseDuration),
       sizes: _parseVariantSets(map, 'sizes', _parseSize),
       configuration: _parseConfigurationSet(map, 'configuration'),
@@ -278,8 +280,15 @@ class ThemeDefinitionParser {
     final scalarNodes =
         value.nodes.entries.where((x) => x.value is YamlScalar).toList();
     for (var scalarNodes in scalarNodes) {
-      properties[scalarNodes.key.toString()] =
-          (scalarNodes.value as YamlScalar).value;
+      final value = (scalarNodes.value as YamlScalar).value;
+      _addValueToken(scalarNodes.key, ThemeParsingTokenType.identifier3);
+      _addValueToken(scalarNodes.value, () {
+        if (value is num) return ThemeParsingTokenType.doubleValue;
+        if (value is bool) return ThemeParsingTokenType.boolValue;
+        return ThemeParsingTokenType.stringValue;
+      }());
+
+      properties[scalarNodes.key.toString()] = value;
     }
 
     // Children
@@ -287,6 +296,7 @@ class ThemeDefinitionParser {
     final mapNodes =
         value.nodes.entries.where((x) => x.value is YamlMap).toList();
     for (var mapNode in mapNodes) {
+      _addValueToken(mapNode.key, ThemeParsingTokenType.identifier3);
       children[mapNode.key.toString()] = _parseConfiguration(mapNode.value);
     }
 
@@ -303,6 +313,32 @@ class ThemeDefinitionParser {
 
   FontSize _parseFontSize(YamlNode value) {
     return FontSize(_parseScalarValueFromNode<double>(value) ?? 0);
+  }
+
+  Image _parseImage(YamlNode value) {
+    final map = value as YamlMap;
+
+    _addKeyTokenWithName(map, 'source', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'path', ThemeParsingTokenType.identifier3);
+    _addKeyTokenWithName(map, 'url', ThemeParsingTokenType.identifier3);
+
+    return Image(
+      source: () {
+        final decoration =
+            _parseScalarValueFromNode<String>(map.nodes['decoration']);
+        switch (decoration?.toLowerCase()) {
+          case 'network':
+            return ImageSource.network;
+          default:
+            return map.nodes.containsKey('url')
+                ? ImageSource.network
+                : ImageSource.asset;
+        }
+      }(),
+      path: _parseScalarValueFromNode<String>(map.nodes['path']) ??
+          _parseScalarValueFromNode<String>(map.nodes['url']) ??
+          '',
+    );
   }
 
   FontStyle _parseFontStyle(YamlNode value) {
